@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="wclassth=device-wclassth, initial-scale=1.0">
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <style>
+        aside {
+            text-align: right;
+        }
+
+        aside>.item {
+            margin-right: 30px;
+        }
+
+        nav label {
+            margin-top: -10px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.dropdown-trigger');
+            var instances = M.Dropdown.init(elems, options);
+        });
+
+        // Or with jQuery
+
+        $('.dropdown-trigger').dropdown();
+    </script>
+</head>
+
+<body>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="nav-wrapper">
+                <a href="#Principal" class="brand-logo left">Logo</a>
+
+                <ul class="right">
+                    <li><a href="#Cuenta">Cuenta</a></li>
+                    <li><a href="#Cesta">Cesta</a></li>
+                </ul>
+                <form class="right">
+                    <div class="input-field">
+                        <input id="search" type="search" required>
+                        <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                        <i class="material-icons">close</i>
+                    </div>
+                </form>
+            </div>
+        </nav>
+    </div>
+
+    <div class="row">
+        <aside class="col s3">
+            <div class="item">
+                <p>asdf</p>
+            </div>
+            <hr>
+            <div class="item">
+                <p>asdf</p>
+            </div>
+            <hr>
+            <div class="item">
+                <p>asdf</p>
+            </div>
+            <hr>
+            <div class="item">
+                <p>asdf</p>
+            </div>
+            <hr>
+        </aside>
+        <div class="col s9">
+            <a class='dropdown-trigger btn' href='#' data-target='dropdown1'>Drop Me!</a>
+
+            <!-- Dropdown Structure -->
+            <ul id='dropdown1' class='dropdown-content'>
+                <li><a href="#!">one</a></li>
+                <li><a href="#!">two</a></li>
+                <li class="divider" tabindex="-1"></li>
+                <li><a href="#!">three</a></li>
+                <li><a href="#!"><i class="material-icons">view_module</i>four</a></li>
+                <li><a href="#!"><i class="material-icons">cloud</i>five</a></li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+</html>
