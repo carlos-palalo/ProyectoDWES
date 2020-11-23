@@ -101,6 +101,9 @@
         .precio {
             font-weight: bold;
         }
+        .browser-default *{
+            font-weight: bold;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -116,9 +119,9 @@
             <nav class="top-nav">
                 <div class="container">
                     <div class="nav-wrapper">
-                        <a href="#" class="brand-logo">Roupalia</a>
+                        <a href="index.html" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
-                            <li><a href="compra.html">Cesta</a></li>
+                            <li><a href="cesta.html">Cesta</a></li>
                             <li><a href="login.html">Cuenta</a></li>
                         </ul>
                     </div>
@@ -149,12 +152,12 @@
         <div class="container-filtro">
             <div class="container">
                 <div class="row">
-                    <div class="filtro col s12 m3">
+                    <div class="filtro col s12 m4">
                         <label>Ordenar</label>
                         <select class="browser-default">
                             <option value="" selected></option>
-                            <option value="1">De mayor a menor</option>
-                            <option value="2">De menor a mayor</option>
+                            <option value="1">De mayor a menor (&gt;)</option>
+                            <option value="2">De menor a mayor (&lt;)</option>
                         </select>
                     </div>
                     <div class="filtro col s12 m3">
@@ -165,7 +168,7 @@
                             <option value="2">Mujer</option>
                         </select>
                     </div>
-                    <div class="filtro col s12 m3">
+                    <div class="filtro col s12 m2">
                         <label>Talla</label>
                         <select class="browser-default">
                             <option value="" selected></option>
