@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- CSS  -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection" />
-    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
     <style>
         header,
         main,
@@ -48,7 +48,8 @@
         .logo a {
             margin: 0 auto;
             height: 100% !important;
-            width: 150px !important;
+            width: 200px !important;
+            margin-bottom: 30px;
         }
 
         .logo img {
@@ -71,6 +72,7 @@
         ul .f:hover {
             transition: background-color 0.5s;
             background-color: gainsboro;
+            cursor: pointer !important;
         }
 
         ul .f {
@@ -101,8 +103,14 @@
         .precio {
             font-weight: bold;
         }
-        .browser-default *{
+
+        .browser-default * {
             font-weight: bold;
+        }
+
+        table th,
+        table td {
+            padding-left: 20px;
         }
     </style>
     <script>
@@ -121,8 +129,7 @@
                     <div class="nav-wrapper">
                         <a href="index.html" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
-                            <li><a href="cesta.html">Cesta</a></li>
-                            <li><a href="login.html">Iniciar Sesión</a></li>
+                            <li><a href="login.html">Admin</a></li>
                         </ul>
                     </div>
                 </div>
@@ -131,21 +138,14 @@
         <ul class="side-nav left fixed">
             <li class="logo">
                 <a id="logo-container" href="" class="brand-logo">
-                    <img src="img/logo.png" alt="Logo">
+                    <img src="../img/logo.png" alt="Logo">
                 </a>
             </li>
-            <li class="search">
-                <form>
-                    <div class="input-field">
-                        <input id="search" type="search" placeholder="Buscar marca o proucto">
-                        <label class="label-icon" for="search"><i class="material-icons right">search</i></label>
-                    </div>
-                </form>
-            </li>
-            <li class="f pantalones"><a href="#">Pantalones</a></li>
-            <li class="f pantalones"><a href="#" class="waves-effect waves-teal">Pantalones</a></li>
-            <li class="f pantalones"><a href="#" class="waves-effect waves-teal">Pantalones</a></li>
-            <li class="f pantalones"><a href="#" class="waves-effect waves-teal">Pantalones</a></li>
+            <li class="f pantalones"><a onclick="">Usuarios</a></li>
+            <li class="f pantalones"><a onclick="">Pedidos</a></li>
+            <li class="f pantalones"><a onclick="">Productos</a></li>
+            <li class="f pantalones"><a onclick="">Proveedores</a></li>
+            <li class="f pantalones"><a onclick="">Transportistas</a></li>
         </ul>
     </header>
     <main>
@@ -196,47 +196,33 @@
         </div>
         <div class="container">
             <div class="row">
-                <div class="productos col s12 m12">
-                    <div class="container-product materialboxed col s12 m4">
-                        <a href="#">
-                            <img src="img/pantalon.jpg" alt="Foto">
-                            <p class="marca">TOM TAILOR</p>
-                            <p class="producto">Pantalón Gris</p>
-                            <p class="precio">22,99 €</p>
-                        </a>
-                    </div>
-                    <div class="container-product materialboxed col s12 m4">
-                        <a href="#">
-                            <img src="img/pantalon.jpg" alt="Foto">
-                            <p class="marca">TOM TAILOR</p>
-                            <p class="producto">Pantalón Gris</p>
-                            <p class="precio">22,99 €</p>
-                        </a>
-                    </div>
-                    <div class="container-product materialboxed col s12 m4">
-                        <a href="#">
-                            <img src="img/pantalon.jpg" alt="Foto">
-                            <p class="marca">TOM TAILOR</p>
-                            <p class="producto">Pantalón Gris</p>
-                            <p class="precio">22,99 €</p>
-                        </a>
-                    </div>
-                    <div class="container-product materialboxed col s12 m4">
-                        <a href="#">
-                            <img src="img/pantalon.jpg" alt="Foto">
-                            <p class="marca">TOM TAILOR</p>
-                            <p class="producto">Pantalón Gris</p>
-                            <p class="precio">22,99 €</p>
-                        </a>
-                    </div>
-                    <div class="container-product materialboxed col s12 m4">
-                        <a href="#">
-                            <img src="img/pantalon.jpg" alt="Foto">
-                            <p class="marca">TOM TAILOR</p>
-                            <p class="producto">Pantalón Gris</p>
-                            <p class="precio">22,99 €</p>
-                        </a>
-                    </div>
+                <div class="tabla col s12 m12">
+                    <table class="striped highlight centered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Item Name</th>
+                                <th>Item Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Alvin</td>
+                                <td>Eclair</td>
+                                <td>$0.87</td>
+                            </tr>
+                            <tr>
+                                <td>Alan</td>
+                                <td>Jellybean</td>
+                                <td>$3.76</td>
+                            </tr>
+                            <tr>
+                                <td>Jonathan</td>
+                                <td>Lollipop</td>
+                                <td>$7.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
