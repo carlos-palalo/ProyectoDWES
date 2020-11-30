@@ -2,17 +2,26 @@
 try {
     require "conexion.php";
     $bd = new PDO('mysql:host=' . $servidor . ';dbname=' . $bd, $usuario, $contrasenia);
-    $categorias = $bd->prepare('SELECT nombre FROM producto GROUP BY nombre');
+    $categorias = $bd->prepare('SELECT categoria FROM producto GROUP BY categoria');
     $productos = $bd->prepare('SELECT * FROM producto');
     $productos_filtrados = $productos;
     $cad = 'SELECT * FROM producto';
+    $where_cont = 0;
     if (isset($_REQUEST['categoria'])) {
-        $cookie_cad;
-        $cad = 'SELECT * FROM producto WHERE nombre = "' . $_REQUEST['categoria'] . '"';
-        setcookie($cookie_cad, $cad, time() + (86400 * 30), "/");
+        setcookie('flag_categoria', "0", time() + (86400 * 30));
+        if ($_REQUEST['categoria'] != "Todo") {
+            $cad = 'SELECT * FROM producto WHERE categoria = "' . $_REQUEST['categoria'] . '"';
+            setcookie('flag_categoria', "1", time() + (86400 * 30));
+        }
+        setcookie('cookie_categoria', $cad, time() + (86400 * 30));
     }
     if (isset($_REQUEST['btn-filtrar'])) {
-        $where_cont = 0;
+        if (isset($_COOKIE['cookie_categoria'])) {
+            if ($_COOKIE['flag_categoria'] != "0") {
+                $cad = $_COOKIE['cookie_categoria'];
+                $where_cont++;
+            }
+        }
         if ($_REQUEST['sexo'] != "") {
             if ($where_cont > 0) {
                 $cad .= ' AND';
@@ -178,11 +187,18 @@ try {
             text-align: center;
         }
     </style>
-    <script>
+    <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
             var elems = document.querySelectorAll('select');
             var instances = M.FormSelect.init(elems);
         });
+
+        function cesta() {
+            <?php
+                
+            ?>
+            alert("Artículo añadido a la cesta.");
+        }
     </script>
 </head>
 
@@ -194,8 +210,8 @@ try {
                     <div class="nav-wrapper">
                         <a href="index.html" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
-                            <li><a href="cesta.html">Cesta</a></li>
-                            <li><a href="login.html">Iniciar Sesión</a></li>
+                            <li><a href="cesta.php">Cesta</a></li>
+                            <li><a href="login.php">Iniciar Sesión</a></li>
                         </ul>
                     </div>
                 </div>
@@ -207,7 +223,7 @@ try {
                     <img src="img/logo.png" alt="Logo">
                 </a>
             </li>
-            <form method="POST">
+            <form method="POST" name="categorias">
                 <li class="search">
                     <div class="input-field">
                         <input id="search" type="search" placeholder="Buscar marca o proucto">
@@ -215,10 +231,15 @@ try {
                     </div>
                 </li>
                 <?php
-                $categorias->execute();
-                while ($fila = $categorias->fetch(PDO::FETCH_OBJ)) {
-                    #echo "<li class='f'><input type='submit' name='" . $fila->nombre . "' value='" . $fila->nombre . "'></li>";
-                    echo "<li class='f'><input type='submit' name='categoria' value='" . $fila->nombre . "'></li>";
+                try {
+                    echo "<li class='f'><input type='submit' name='categoria' value='Todo'></li>";
+                    $categorias->execute();
+                    while ($fila = $categorias->fetch(PDO::FETCH_OBJ)) {
+                        #echo "<li class='f'><input type='submit' name='" . $fila->nombre . "' value='" . $fila->nombre . "'></li>";
+                        echo "<li class='f'><input type='submit' name='categoria' value='" . $fila->categoria . "'></li>";
+                    }
+                } catch (Exception $e) {
+                    echo "<script>console.log('Error Categorías. " . $e . "')</script>";
                 }
                 ?>
             </form>
@@ -250,9 +271,13 @@ try {
                             <select name="talla" class="browser-default">
                                 <option value="" selected></option>
                                 <?php
-                                $talla->execute();
-                                while ($fila = $talla->fetch(PDO::FETCH_OBJ)) {
-                                    echo '<option value="' . $fila->talla . '">' . $fila->talla . '</option>';
+                                try {
+                                    $talla->execute();
+                                    while ($fila = $talla->fetch(PDO::FETCH_OBJ)) {
+                                        echo '<option value="' . $fila->talla . '">' . $fila->talla . '</option>';
+                                    }
+                                } catch (Exception $e) {
+                                    echo "<script>console.log('Error Tallas. " . $e . "')</script>";
                                 }
                                 ?>
                             </select>
@@ -262,9 +287,13 @@ try {
                             <select name="marca" class="browser-default">
                                 <option value="" selected></option>
                                 <?php
-                                $marca->execute();
-                                while ($fila = $marca->fetch(PDO::FETCH_OBJ)) {
-                                    echo '<option value="' . $fila->marca . '">' . $fila->marca . '</option>';
+                                try {
+                                    $marca->execute();
+                                    while ($fila = $marca->fetch(PDO::FETCH_OBJ)) {
+                                        echo '<option value="' . $fila->marca . '">' . $fila->marca . '</option>';
+                                    }
+                                } catch (Exception $e) {
+                                    echo "<script>console.log('Error Marcas. " . $e . "')</script>";
                                 }
                                 ?>
                             </select>
@@ -275,72 +304,49 @@ try {
                     </form>
                 </div>
             </div>
-            <!-- Ordenar precio, talla, marca  -->
         </div>
         <div class="container">
             <div class="row">
                 <div class="productos col s12 m12">
                     <?php
-                    $productos_filtrados->execute();
-                    $count = $productos_filtrados->rowCount();
-                    if ($count == 0) {
-                        echo '<p class="error">Lo sentimos, no se han encontrado productos</p>';
-                    } else {
+                    try {
                         $productos_filtrados->execute();
-                        while ($fila = $productos_filtrados->fetch(PDO::FETCH_OBJ)) {
-                            echo '
+                        $count = $productos_filtrados->rowCount();
+                        if ($count == 0) {
+                            echo '<p class="error">Lo sentimos, no se han encontrado productos</p>';
+                        } else {
+                            $productos_filtrados->execute();
+                            while ($fila = $productos_filtrados->fetch(PDO::FETCH_OBJ)) {
+                                echo '
                         <div class="container-product materialboxed col s12 m4">
-                        <a href="#">
-                            <img src="img/pantalon.jpg" alt="Foto">
-                            <p class="marca">' . $fila->marca . '</p>
-                            <p class="producto">' . $fila->nombre . '</p>
-                            ';
-                            switch ($fila->sexo) {
-                                case "H":
-                                    echo '<p class="genero">Hombre -- ' . $fila->talla . '</p>';
-                                    break;
-                                case "M":
-                                    echo '<p class="genero">Mujer -- ' . $fila->talla . '</p>';
-                                    break;
-                            }
-                            echo '
-                            <p class="precio">' . $fila->pvp . ' €</p>
-                        </a>
+                            <a onclick="cesta()" id="prod' . $fila->id_producto . '" name="prod' . $fila->id_producto . '">
+                                <img src="img/pantalon.jpg" alt="Foto">
+                                <p class="marca">' . $fila->marca . '</p>
+                                <p class="producto">' . $fila->nombre . '</p>
+                                ';
+                                switch ($fila->sexo) {
+                                    case "H":
+                                        echo '<p class="genero">Hombre -- ' . $fila->talla . '</p>';
+                                        break;
+                                    case "M":
+                                        echo '<p class="genero">Mujer -- ' . $fila->talla . '</p>';
+                                        break;
+                                }
+                                echo '
+                                <p class="precio">' . $fila->pvp . ' €</p>
+                            </a>
                         </div>
                         ';
+                            }
                         }
+                    } catch (Exception $e) {
+                        echo "<script>console.log('Error Productos. " . $e . "')</script>";
                     }
                     ?>
                 </div>
             </div>
         </div>
     </main>
-    <footer class="page-footer">
-        <div class="container">
-            <div class="row">
-                <div class="col l6 s12">
-                    <h5 class="white-text">Footer Content</h5>
-                    <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer
-                        content.</p>
-                </div>
-                <div class="col l4 offset-l2 s12">
-                    <h5 class="white-text">Links</h5>
-                    <ul>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <div class="container">
-                © 2014 Copyright Text
-                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
-            </div>
-        </div>
-    </footer>
 </body>
 
 </html>
