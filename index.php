@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<?php
+session_start();
+$_SESSION['cesta'] = array();
+?>
 <html>
 
 <head>

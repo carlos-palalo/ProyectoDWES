@@ -1,5 +1,8 @@
+<!DOCTYPE html>
+<html>
 <?php
 try {
+    session_start();
     require "conexion.php";
     $bd = new PDO('mysql:host=' . $servidor . ';dbname=' . $bd, $usuario, $contrasenia);
     $categorias = $bd->prepare('SELECT categoria FROM producto GROUP BY categoria');
@@ -7,6 +10,28 @@ try {
     $productos_filtrados = $productos;
     $cad = 'SELECT * FROM producto';
     $where_cont = 0;
+    if (isset($_REQUEST['btn-cesta'])) {
+        $newCesta = array(
+            'id' => $_REQUEST['product_id'],
+            'cantidad' => htmlspecialchars($_REQUEST['cantidad'])
+        );
+        $flag = false;
+        foreach ($_SESSION['cesta'] as $producto) {
+            foreach ($producto as $key => $value) {
+                if ($key == "id") {
+                    if ($value == $newCesta['id']) {
+                        $flag = true;
+                    }
+                }
+            }
+        }
+        if ($flag) {
+            echo "\nError";
+        } else {
+            $_SESSION['cesta'][] = $newCesta;
+            var_dump($_SESSION['cesta']);
+        }
+    }
     if (isset($_REQUEST['categoria'])) {
         setcookie('flag_categoria', "0", time() + (86400 * 30));
         if ($_REQUEST['categoria'] != "Todo") {
@@ -60,8 +85,6 @@ try {
     echo "<script>console.log('" . $e . "')</script>";
 }
 ?>
-<!DOCTYPE html>
-<html>
 
 <head>
     <meta charset="UTF-8">
@@ -186,6 +209,24 @@ try {
             font-weight: bold;
             text-align: center;
         }
+
+        #cesta {
+            position: fixed;
+            padding: 20px;
+            top: 0px;
+            right: 12%;
+            background-color: white;
+            font-size: 14px;
+            color: black;
+            box-shadow: 0px 0px 0px 1px gainsboro;
+            font-weight: bold;
+            transition: top 1s;
+        }
+
+        [name="cesta"] button {
+            width: 100%;
+            font-weight: bold;
+        }
     </style>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
@@ -194,10 +235,10 @@ try {
         });
 
         function cesta() {
-            <?php
-                
-            ?>
-            alert("Artículo añadido a la cesta.");
+            document.getElementById("cesta").style.top = "64px";
+            setTimeout(function() {
+                document.getElementById("cesta").style.top = "0px";
+            }, 1500);
         }
     </script>
 </head>
@@ -245,6 +286,7 @@ try {
             </form>
         </ul>
     </header>
+    <div id="cesta">Producto añadido a la cesta</div>
     <main>
         <div class="container-filtro">
             <div class="container">
@@ -310,6 +352,10 @@ try {
                 <div class="productos col s12 m12">
                     <?php
                     try {
+                        if (isset($_REQUEST['btn-cesta'])) {
+                            echo "<script>cesta()</script>";
+                        }
+
                         $productos_filtrados->execute();
                         $count = $productos_filtrados->rowCount();
                         if ($count == 0) {
@@ -318,8 +364,8 @@ try {
                             $productos_filtrados->execute();
                             while ($fila = $productos_filtrados->fetch(PDO::FETCH_OBJ)) {
                                 echo '
-                        <div class="container-product materialboxed col s12 m4">
-                            <a onclick="cesta()" id="prod' . $fila->id_producto . '" name="prod' . $fila->id_producto . '">
+                        <div class="container-product col s12 m4">
+                            <a id="prod' . $fila->id_producto . '" name="prod' . $fila->id_producto . '">
                                 <img src="img/pantalon.jpg" alt="Foto">
                                 <p class="marca">' . $fila->marca . '</p>
                                 <p class="producto">' . $fila->nombre . '</p>
@@ -334,6 +380,11 @@ try {
                                 }
                                 echo '
                                 <p class="precio">' . $fila->pvp . ' €</p>
+                                <form method="POST" name="cesta">
+                                    <input type="number" name="cantidad" min="1" max="' . $fila->cantidad . '" placeholder="Cantidad" required>
+                                    <input type="hidden" name="product_id" value="' . $fila->id_producto . '">
+                                    <button onclick="setTimeout(cesta(),10000)" class="btn white black-text lighten-1" type="submit" name="btn-cesta">Añadir a la cesta</button>
+                                </form>
                             </a>
                         </div>
                         ';

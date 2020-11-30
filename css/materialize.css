@@ -5914,9 +5914,6 @@ button.btn-floating {
   -webkit-backface-visibility: hidden;
 }
 
-.materialboxed:hover:not(.active) {
-  opacity: .8;
-}
 
 #materialbox-overlay {
   position: fixed;
