@@ -108,6 +108,10 @@
         .metodo_pago label {
             color: black;
         }
+
+        .importe {
+            margin-bottom: 30px;
+        }
     </style>
     <script>
     </script>
@@ -122,6 +126,10 @@
                     <div class="row">
                         <div class="nav-wrapper col s12 m12">
                             <a href="index.html" class="brand-logo">Roupalia</a>
+                            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                                <li><a href="productos.php">Productos</a></li>
+                                <li><a href="login.php">Iniciar Sesión</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -167,6 +175,10 @@
                         <div class="input-field col s12 m8">
                             <input id="pais" name="pais" type="text" placeholder="Número Tarjeta" required>
                         </div>
+                    </div>
+                    <div class="importe col s12 m12">
+                        <p class="col s12 m12">Importe Total:</p>
+
                     </div>
                     <div class="boton">
                         <button class="btn white lighten-1 black-text" type="submit" name="submit">Comprar</button>

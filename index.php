@@ -90,14 +90,15 @@ $_SESSION['cesta'] = array();
 
 <body>
     <header>
-        <div class="navbar-fixed">
+    <div class="navbar-fixed">
             <nav class="top-nav">
-
                 <div class="container">
-                    <div class="row">
-                        <div class="nav-wrapper col s12 m12">
-                            <a href="index.html" class="brand-logo">Roupalia</a>
-                        </div>
+                    <div class="nav-wrapper">
+                        <a href="index.php" class="brand-logo">Roupalia</a>
+                        <ul id="nav-mobile" class="right hide-on-med-and-down">
+                            <li><a href="productos.php">Productos</a></li>
+                            <li><a href="login.php">Iniciar Sesión</a></li>
+                        </ul>
                     </div>
                 </div>
             </nav>

@@ -92,7 +92,10 @@
                 <div class="container">
                     <div class="row">
                         <div class="nav-wrapper col s12 m12">
-                            <a href="index.html" class="brand-logo">Roupalia</a>
+                            <a href="index.php" class="brand-logo">Roupalia</a>
+                            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                                <li><a href="productos.php">Productos</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>

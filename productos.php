@@ -24,11 +24,9 @@ try {
                 }
             }
         }
-        if ($flag) {
-            echo "<script>alert('El producto ya se encuentra añadido a la cesta')</script>";
-        } else {
+        if (!$flag) {
             $_SESSION['cesta'][] = $newCesta;
-        }
+        } 
     }
     if (isset($_REQUEST['categoria'])) {
         setcookie('flag_categoria', "0", time() + (86400 * 30));
@@ -223,9 +221,15 @@ try {
 
         #error{
             position: fixed;
-            padding: 20px;
-            top: 25%;
-            left: 25%;
+            padding: 40px;
+            top: 40%;
+            left: -10%;
+            margin: 0 auto;
+            font-size: large;
+            color: black;
+            background-color: white;
+            box-shadow: 0 0 0 1px gainsboro;
+            transition: left 2s;
         }
 
         [name="cesta"] button {
@@ -247,10 +251,10 @@ try {
         }
 
         function error_cesta() {
-            document.getElementById("error").style.width = "200px";
+            document.getElementById("error").style.left = "40%";
             setTimeout(function() {
-                document.getElementById("error").style.width = "0px";
-            }, 1500);
+                document.getElementById("error").style.left = "-10%";
+            }, 3500);
         }
     </script>
 </head>
@@ -261,7 +265,7 @@ try {
             <nav class="top-nav">
                 <div class="container">
                     <div class="nav-wrapper">
-                        <a href="index.html" class="brand-logo">Roupalia</a>
+                        <a href="index.php" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
                             <li><a href="cesta.php">Cesta</a></li>
                             <li><a href="login.php">Iniciar Sesión</a></li>
