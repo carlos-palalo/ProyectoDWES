@@ -9,12 +9,12 @@ try {
     $productos_filtrados = $productos;
     $cad = 'SELECT * FROM producto';
     $where_cont = 0;
+    $flag = false;
     if (isset($_REQUEST['btn-cesta'])) {
         $newCesta = array(
             'id' => $_REQUEST['product_id'],
             'cantidad' => htmlspecialchars($_REQUEST['cantidad'])
         );
-        $flag = false;
         foreach ($_SESSION['cesta'] as $producto) {
             foreach ($producto as $key => $value) {
                 if ($key == "id") {
@@ -221,6 +221,13 @@ try {
             transition: top 1s;
         }
 
+        #error{
+            position: fixed;
+            padding: 20px;
+            top: 25%;
+            left: 25%;
+        }
+
         [name="cesta"] button {
             width: 100%;
             font-weight: bold;
@@ -236,6 +243,13 @@ try {
             document.getElementById("cesta").style.top = "64px";
             setTimeout(function() {
                 document.getElementById("cesta").style.top = "0px";
+            }, 1500);
+        }
+
+        function error_cesta() {
+            document.getElementById("error").style.width = "200px";
+            setTimeout(function() {
+                document.getElementById("error").style.width = "0px";
             }, 1500);
         }
     </script>
@@ -285,6 +299,7 @@ try {
         </ul>
     </header>
     <div id="cesta">Producto añadido a la cesta</div>
+    <div id="error">El producto ya se encuentra en la cesta</div>
     <main>
         <div class="container-filtro">
             <div class="container">
@@ -350,9 +365,14 @@ try {
                 <div class="productos col s12 m12">
                     <?php
                     try {
-                        if (isset($_REQUEST['btn-cesta']) && $flag != true) {
-                            echo "<script>cesta()</script>";
+                        if ($flag == true) {
+                            echo "<script>error_cesta()</script>";
+                        } else {
+                            if (isset($_REQUEST['btn-cesta'])) {
+                                echo "<script>cesta()</script>";
+                            }
                         }
+
 
                         $productos_filtrados->execute();
                         $count = $productos_filtrados->rowCount();
