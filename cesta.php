@@ -35,6 +35,7 @@ try {
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection" />
     <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <style>
         body {
             margin: 0px;
@@ -118,6 +119,15 @@ try {
             font-size: x-large;
         }
 
+        .subtitulo {
+            font-weight: bold;
+            font-size: large;
+            position: absolute;
+            top: 100px;
+            z-index: -1;
+            transition: top 1s;
+        }
+
         .container-select label {
             color: gray;
             font-size: medium;
@@ -147,14 +157,30 @@ try {
         function cambiar() {
             var cantidad = document.getElementsByTagName("select");
             var productos = document.getElementsByClassName("product");
-            alert(productos.item(1).children[1].children[3].attributes.getNamedItem("value").value);
+            //alert(productos.item(1).children[1].children[3].attributes.getNamedItem("value").value);
             var numArticulos = 0,
                 subtotal = 0,
                 total = 0;
             for (var i = 0; i < cantidad.length; i++) {
                 numArticulos += cantidad[i].options.selectedIndex + 1;
             }
+            for (var j = 0; j < productos.length; j++) {
+                subtotal += parseFloat(productos.item(j).children[1].children[3].attributes.getNamedItem("value").value) * (productos.item(j).children[2].children[1].options.selectedIndex + 1);
+            }
+            document.getElementById("subtotal").innerText = subtotal.toFixed(2) + " €";
+            document.getElementById("total").innerText = (subtotal * 121 / 100).toFixed(2) + " €";
             document.getElementById("articulos").innerText = "Mi cesta (" + numArticulos + " artículos)";
+            if (productos.length == 0) {
+                return true;
+            }
+        }
+
+        function eliminar(elemento) {
+            elemento.parentNode.parentNode.remove();
+            if (cambiar()) {
+                document.getElementById("vacio").style.top = "200px";
+                setTimeout("location.href='index.php'",5000);
+            }
         }
     </script>
 </head>
@@ -186,6 +212,7 @@ try {
                                 $articulos += $producto['cantidad'];
                             }
                             echo '<div id="articulos" class="titulo col s12 m12">Mi cesta (' . $articulos . ' artículos)</div>';
+                            echo '<div id="vacio" class="subtitulo col s12 m12">Cesta vacía... Volviendo a Productos</div>';
                             $productos->execute();
                             while ($fila = $productos->fetch(PDO::FETCH_OBJ)) {
                                 echo '
@@ -206,14 +233,11 @@ try {
 
                                 echo '
                                         <p class="precio" value="' . $fila->pvp . '">' . $fila->pvp . ' €</p>
-                                        <form method="POST" name="btn">
-                                            <input type="hidden" name="product_id" value="' . $fila->id_producto . '">
-                                            <button class="btn white black-text lighten-1" type="submit" name="btn-eliminar">Eliminar</button>
-                                        </form>
+                                            <button class="btn white black-text lighten-1" name="btn-eliminar" onclick="eliminar(this)">Eliminar</button>
                                     </div>
                                     <div class="container-select col s12 m3">
                                         <label>Cantidad</label>
-                                        <select class="browser-default" onchange="cambiar()">';
+                                        <select name="cantidad' . $fila->id_producto . '" class="browser-default" onchange="cambiar()">';
 
                                 for ($i = 1; $i <= $fila->cantidad; $i++) {
                                     foreach ($_SESSION['cesta'] as $producto) {
@@ -248,7 +272,7 @@ try {
                         <div class="row">
                             <div class="txt-dinero">Subtotal</div>
                             <?php
-                            echo '<div class="dinero">' . $subtotal . ' €</div>';
+                            echo '<div class="dinero" id="subtotal">' . number_format($subtotal, 2) . ' €</div>';
                             ?>
                         </div>
                         <div class="row">
@@ -260,7 +284,7 @@ try {
                             <div class="txt-dinero">Total (IVA incluido)</div>
                             <?php
                             $total = $subtotal * 121 / 100;
-                            echo '<div class="dinero">' . number_format($total, 2) . ' €</div>';
+                            echo '<div class="dinero" id="total">' . number_format($total, 2) . ' €</div>';
                             ?>
 
                         </div>
