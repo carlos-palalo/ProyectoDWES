@@ -4,7 +4,6 @@
 try {
     session_start();
     require "conexion.php";
-    $bd = new PDO('mysql:host=' . $servidor . ';dbname=' . $bd, $usuario, $contrasenia);
     $categorias = $bd->prepare('SELECT categoria FROM producto GROUP BY categoria');
     $productos = $bd->prepare('SELECT * FROM producto');
     $productos_filtrados = $productos;
@@ -26,10 +25,9 @@ try {
             }
         }
         if ($flag) {
-            echo "\nError";
+            echo "<script>alert('El producto ya se encuentra añadido a la cesta')</script>";
         } else {
             $_SESSION['cesta'][] = $newCesta;
-            var_dump($_SESSION['cesta']);
         }
     }
     if (isset($_REQUEST['categoria'])) {
@@ -352,7 +350,7 @@ try {
                 <div class="productos col s12 m12">
                     <?php
                     try {
-                        if (isset($_REQUEST['btn-cesta'])) {
+                        if (isset($_REQUEST['btn-cesta']) && $flag != true) {
                             echo "<script>cesta()</script>";
                         }
 

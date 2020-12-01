@@ -1,5 +1,6 @@
 <?php
 $servidor = 'localhost';
-$bd = 'proyectotiendaropa_carlosp';
+$db = 'proyectotiendaropa_carlosp';
 $usuario = 'carlos';
 $contrasenia = 'carlos';
+$bd = new PDO('mysql:host=' . $servidor . ';dbname=' . $db, $usuario, $contrasenia);
