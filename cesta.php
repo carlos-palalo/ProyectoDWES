@@ -162,8 +162,8 @@ try {
                 subtotal = 0,
                 total = 0;
             if (productos.length == 0) {
-                document.getElementById("subtotal").innerText = subtotal.toFixed(2) + " €";
-                document.getElementById("total").innerText = (subtotal * 121 / 100).toFixed(2) + " €";
+                document.getElementById("subtotal").innerText = "0.00 €";
+                document.getElementById("total").innerText = "0.00 €";
                 document.getElementById("articulos").innerText = "Mi cesta (" + numArticulos + " artículos)";
                 return true;
             } else {
@@ -180,12 +180,13 @@ try {
         }
 
         function eliminar(elemento) {
-            elemento.parentNode.parentNode.remove();
+            elemento.parentNode.parentNode.parentNode.remove();
             comprobar();
         }
 
         function comprobar() {
             if (cambiar()) {
+                console.log("a");
                 document.getElementById("vacio").style.top = "200px";
                 setTimeout("location.href='productos.php'", 1500);
             }
@@ -222,20 +223,20 @@ try {
                             }
                             if ($articulos == 0) {
                                 echo '<div id="articulos" class="titulo col s12 m12">Mi cesta (' . $articulos . ' artículos)</div>';
-                                echo "<script>comprobar()</script>";
                             } else {
                                 echo '<div id="articulos" class="titulo col s12 m12">Mi cesta (' . $articulos . ' artículos)</div>';
                                 $productos->execute();
                                 while ($fila = $productos->fetch(PDO::FETCH_OBJ)) {
                                     echo '
-                                <div class="product col s12 m12">
-                                    <div class="container-img col s12 m3">
-                                        <img src="img/pantalon.jpg" alt="Foto">
-                                    </div>
-                                    <div class="container-info col s12 m6">
-                                        <p class="marca">' . $fila->marca . '</p>
-                                        <p class="producto">' . $fila->nombre . '</p>
-                                        ';
+                                    <form method="POST" name="form' . $fila->id_producto . '">
+                                        <div class="product col s12 m12">
+                                            <div class="container-img col s12 m3">
+                                                <img src="img/pantalon.jpg" alt="Foto">
+                                            </div>
+                                            <div class="container-info col s12 m6">
+                                                <p class="marca">' . $fila->marca . '</p>
+                                                <p class="producto">' . $fila->nombre . '</p>
+                                                ';
 
                                     if ($fila->sexo == "H") {
                                         echo '<p class="genero">Hombre -- ' . $fila->talla . '</p>';
@@ -244,35 +245,36 @@ try {
                                     }
 
                                     echo '
-                                        <p class="precio" value="' . $fila->pvp . '">' . $fila->pvp . ' €</p>
-                                            <button class="btn white black-text lighten-1" name="btn-eliminar" onclick="eliminar(this)">Eliminar</button>
-                                    </div>
-                                    <div class="container-select col s12 m3">
-                                        <label>Cantidad</label>
-                                        <select name="cantidad' . $fila->id_producto . '" class="browser-default" onchange="cambiar()">';
+                                                <p class="precio" value="' . $fila->pvp . '">' . $fila->pvp . ' €</p>
+                                                    <button class="btn white black-text lighten-1" name="btn-eliminar" onclick="eliminar(this)">Eliminar</button>
+                                            </div>
+                                            <div class="container-select col s12 m3">
+                                                <label>Cantidad</label>
+                                                <select name="cantidad' . $fila->id_producto . '" class="browser-default" onchange="cambiar()">';
 
                                     for ($i = 1; $i <= $fila->cantidad; $i++) {
                                         foreach ($_SESSION['cesta'] as $producto) {
                                             if ($producto['id'] == $fila->id_producto) {
                                                 if ($i == $producto['cantidad']) {
                                                     echo '
-                                                    <option value="' . $i . '" selected>' . $i . '</option>
-                                                ';
+                                                            <option value="' . $i . '" selected>' . $i . '</option>
+                                                        ';
                                                     $subtotal += $fila->pvp * $i;
                                                 } else {
                                                     echo '
-                                                    <option value="' . $i . '">' . $i . '</option>
-                                                ';
+                                                            <option value="' . $i . '">' . $i . '</option>
+                                                        ';
                                                 }
                                             }
                                         }
                                     }
 
                                     echo '  
-                                        </select>
-                                    </div>
-                                </div>
-                                ';
+                                                    </select>
+                                                </div>
+                                            </div>
+                                    </form>
+                                    ';
                                 }
                             }
                         } catch (Exception $e) {
@@ -298,8 +300,10 @@ try {
                             <?php
                             $total = $subtotal * 121 / 100;
                             echo '<div class="dinero" id="total">' . number_format($total, 2) . ' €</div>';
+                            if ($articulos == 0) {
+                                echo "<script>comprobar()</script>";
+                            }
                             ?>
-
                         </div>
                         <a href="factura.php" class="col s12 m12 btn white black-text lighten-1">COMENZAR PEDIDO</a>
                     </div>

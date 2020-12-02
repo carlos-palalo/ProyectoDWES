@@ -124,12 +124,13 @@ try {
 
         .logo {
             padding-top: 30px;
+            margin-bottom: 18px;
         }
 
         .logo a {
             margin: 0 auto;
             height: 100% !important;
-            width: 150px !important;
+            width: 200px !important;
         }
 
         .logo img {
@@ -281,12 +282,6 @@ try {
                 </a>
             </li>
             <form method="POST" name="categorias">
-                <li class="search">
-                    <div class="input-field">
-                        <input id="search" type="search" placeholder="Buscar marca o proucto">
-                        <label class="label-icon" for="search"><i class="material-icons right">search</i></label>
-                    </div>
-                </li>
                 <?php
                 try {
                     echo "<li class='f'><input type='submit' name='categoria' value='Todo'></li>";
