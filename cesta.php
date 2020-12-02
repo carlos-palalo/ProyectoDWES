@@ -9,7 +9,20 @@ try {
     $articulos = 0;
     $cad = 'SELECT * FROM producto WHERE id_producto IN (';
     $where_cont = 0;
-    foreach ($_SESSION['cesta'] as $producto) {
+    $cont_cesta = count($_SESSION['cesta']);
+    for ($i = 0; $i < $cont_cesta; $i++) {
+        if (isset($_REQUEST['btn-eliminar']) && $_SESSION['cesta'][$i]['id'] == $_REQUEST['product_id']) {
+            unset($_SESSION['cesta'][$i]);
+        } else {
+            if ($where_cont == 0) {
+                $cad .= $_SESSION['cesta'][$i]['id'];
+                $where_cont++;
+            } else {
+                $cad .= ', ' . $_SESSION['cesta'][$i]['id'];
+            }
+        }
+    }
+    /*foreach ($_SESSION['cesta'] as $producto) {
         foreach ($producto as $key => $value) {
             if ($key == "id") {
                 if ($where_cont == 0) {
@@ -20,7 +33,7 @@ try {
                 }
             }
         }
-    }
+    }*/
     $cad .= ')';
     $productos = $bd->prepare($cad);
 } catch (Exception $e) {
@@ -157,7 +170,6 @@ try {
         function cambiar() {
             var cantidad = document.getElementsByTagName('select');
             var productos = document.getElementsByClassName('product');
-            //alert(productos.item(1).children[1].children[3].attributes.getNamedItem('value').value);
             var numArticulos = 0,
                 subtotal = 0,
                 total = 0;
@@ -180,7 +192,7 @@ try {
         }
 
         function eliminar(elemento) {
-            elemento.parentNode.parentNode.parentNode.remove();
+            elemento.parentNode.parentNode.remove();
             comprobar();
         }
 
@@ -245,11 +257,13 @@ try {
 
                                     echo '
                                                 <p class="precio" value="' . $fila->pvp . '">' . $fila->pvp . ' €</p>
-                                                    <button class="btn white black-text lighten-1" name="btn-eliminar" onclick="eliminar(this)">Eliminar</button>
-                                            </div>
+                                                <input type="hidden" name="product_id" value="' . $fila->id_producto . '">
+                                                <button class="btn white black-text lighten-1" name="btn-eliminar">Eliminar</button>
+                                                </div>
                                             <div class="container-select col s12 m3">
                                                 <label>Cantidad</label>
                                                 <select name="cantidad' . $fila->id_producto . '" class="browser-default" onchange="cambiar()">';
+                                    #<button class="btn white black-text lighten-1" name="btn-eliminar" onclick="eliminar(this)">Eliminar</button>
 
                                     for ($i = 1; $i <= $fila->cantidad; $i++) {
                                         foreach ($_SESSION['cesta'] as $producto) {
