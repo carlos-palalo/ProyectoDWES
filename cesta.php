@@ -155,27 +155,27 @@ try {
         });
 
         function cambiar() {
-            var cantidad = document.getElementsByTagName("select");
-            var productos = document.getElementsByClassName("product");
-            //alert(productos.item(1).children[1].children[3].attributes.getNamedItem("value").value);
+            var cantidad = document.getElementsByTagName('select');
+            var productos = document.getElementsByClassName('product');
+            //alert(productos.item(1).children[1].children[3].attributes.getNamedItem('value').value);
             var numArticulos = 0,
                 subtotal = 0,
                 total = 0;
             if (productos.length == 0) {
-                document.getElementById("subtotal").innerText = "0.00 €";
-                document.getElementById("total").innerText = "0.00 €";
-                document.getElementById("articulos").innerText = "Mi cesta (" + numArticulos + " artículos)";
+                document.getElementById('subtotal').innerText = '0.00 €';
+                document.getElementById('total').innerText = '0.00 €';
+                document.getElementById('articulos').innerText = 'Mi cesta (' + numArticulos + ' artículos)';
                 return true;
             } else {
                 for (var i = 0; i < cantidad.length; i++) {
                     numArticulos += cantidad[i].options.selectedIndex + 1;
                 }
                 for (var j = 0; j < productos.length; j++) {
-                    subtotal += parseFloat(productos.item(j).children[1].children[3].attributes.getNamedItem("value").value) * (productos.item(j).children[2].children[1].options.selectedIndex + 1);
+                    subtotal += parseFloat(productos.item(j).children[1].children[3].attributes.getNamedItem('value').value) * (productos.item(j).children[2].children[1].options.selectedIndex + 1);
                 }
-                document.getElementById("subtotal").innerText = subtotal.toFixed(2) + " €";
-                document.getElementById("total").innerText = (subtotal * 121 / 100).toFixed(2) + " €";
-                document.getElementById("articulos").innerText = "Mi cesta (" + numArticulos + " artículos)";
+                document.getElementById('subtotal').innerText = subtotal.toFixed(2) + ' €';
+                document.getElementById('total').innerText = (subtotal * 121 / 100).toFixed(2) + ' €';
+                document.getElementById('articulos').innerText = 'Mi cesta (' + numArticulos + ' artículos)';
             }
         }
 
@@ -186,9 +186,8 @@ try {
 
         function comprobar() {
             if (cambiar()) {
-                console.log("a");
-                document.getElementById("vacio").style.top = "200px";
-                setTimeout("location.href='productos.php'", 1500);
+                document.getElementById('vacio').style.top = '200px';
+                setTimeout('location.href="productos.php"', 1500);
             }
         }
     </script>
