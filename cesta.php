@@ -9,6 +9,15 @@ try {
     $articulos = 0;
     $cad = 'SELECT * FROM producto WHERE id_producto IN (';
     $where_cont = 0;
+    $aux = array();
+    if (isset($_REQUEST['btn-eliminar'])) {
+        for ($i = 0; $i < count($_SESSION['cesta']); $i++) {
+            if ($_SESSION['cesta'][$i]['id'] != $_REQUEST['product_id']) {
+                $aux[] = $_SESSION['cesta'][$i];
+            }
+        }
+        $_SESSION['cesta'] = $aux;
+    }
     foreach ($_SESSION['cesta'] as $producto) {
         foreach ($producto as $key => $value) {
             if ($key == "id") {
@@ -179,11 +188,6 @@ try {
             }
         }
 
-        function eliminar(elemento) {
-            elemento.parentNode.parentNode.parentNode.remove();
-            comprobar();
-        }
-
         function comprobar() {
             if (cambiar()) {
                 document.getElementById('vacio').style.top = '200px';
@@ -245,7 +249,8 @@ try {
 
                                     echo '
                                                 <p class="precio" value="' . $fila->pvp . '">' . $fila->pvp . ' €</p>
-                                                    <button class="btn white black-text lighten-1" name="btn-eliminar" onclick="eliminar(this)">Eliminar</button>
+                                                <input type="hidden" name="product_id" value="' . $fila->id_producto . '">
+                                                <button class="btn white black-text lighten-1" name="btn-eliminar">Eliminar</button>
                                             </div>
                                             <div class="container-select col s12 m3">
                                                 <label>Cantidad</label>
