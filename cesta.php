@@ -29,7 +29,7 @@ try {
                 }
             }
         }
-    }*/
+    }
     $cad .= ')';
     $productos = $bd->prepare($cad);
 } catch (Exception $e) {
@@ -187,14 +187,6 @@ try {
             }
         }
 
-<<<<<<< HEAD
-        function eliminar(elemento) {
-            elemento.parentNode.parentNode.remove();
-            comprobar();
-        }
-
-=======
->>>>>>> 0cbb5ea3a815b354a1db1a6cb46ac4ba7ba4f7ef
         function comprobar() {
             if (cambiar()) {
                 document.getElementById('vacio').style.top = '200px';
@@ -258,11 +250,7 @@ try {
                                                 <p class="precio" value="' . $fila->pvp . '">' . $fila->pvp . ' €</p>
                                                 <input type="hidden" name="product_id" value="' . $fila->id_producto . '">
                                                 <button class="btn white black-text lighten-1" name="btn-eliminar">Eliminar</button>
-<<<<<<< HEAD
-                                                </div>
-=======
                                             </div>
->>>>>>> 0cbb5ea3a815b354a1db1a6cb46ac4ba7ba4f7ef
                                             <div class="container-select col s12 m3">
                                                 <label>Cantidad</label>
                                                 <select name="cantidad' . $fila->id_producto . '" class="browser-default" onchange="cambiar()">';
