@@ -1,5 +1,22 @@
 <!DOCTYPE html>
 <html>
+<?php
+try {
+    session_start();
+    require "../conexion.php";
+    $tablas = $bd->prepare('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = "proyectotiendaropa_carlosp"');
+    $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "cesta"');
+    $nombreTabla = "cesta";
+    $info =  $bd->prepare('SELECT * FROM '.$nombreTabla.'', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    if (isset($_REQUEST['tabla'])) {
+        $nombreTabla = $_REQUEST['tabla'];
+        $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
+        $info =  $bd->prepare('SELECT * FROM ' . $nombreTabla . '', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    }
+} catch (Exception $e) {
+    echo "<script>console.log('" . $e . "')</script>";
+}
+?>
 
 <head>
     <meta charset="UTF-8">
@@ -79,6 +96,18 @@
             font-weight: bold;
         }
 
+        ul .f input {
+            background-color: white;
+            border: none;
+            width: 100%;
+            line-height: 48px;
+        }
+
+        ul .f input:hover {
+            transition: background-color 0.5s;
+            background-color: gainsboro;
+        }
+
         .container-product {
             margin-top: 20px;
             display: inline-block;
@@ -107,14 +136,20 @@
         .browser-default * {
             font-weight: bold;
         }
-
-        table th,
-        table td {
-            padding-left: 20px;
+        table td{
+            padding: 0px;
+        }
+        table input{
+            padding: 15px 0px;
+            text-align: center;
+            border: none;
+            width: 100%;
+            height: 100%;
+            font-size: 14px;
         }
     </style>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             var elems = document.querySelectorAll('select');
             var instances = M.FormSelect.init(elems);
         });
@@ -127,7 +162,7 @@
             <nav class="top-nav">
                 <div class="container">
                     <div class="nav-wrapper">
-                        <a href="index.html" class="brand-logo">Roupalia</a>
+                        <a href="../index.php" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
                             <li><a href="login.html">Admin</a></li>
                         </ul>
@@ -141,11 +176,18 @@
                     <img src="../img/logo.png" alt="Logo">
                 </a>
             </li>
-            <li class="f pantalones"><a onclick="">Usuarios</a></li>
-            <li class="f pantalones"><a onclick="">Pedidos</a></li>
-            <li class="f pantalones"><a onclick="">Productos</a></li>
-            <li class="f pantalones"><a onclick="">Proveedores</a></li>
-            <li class="f pantalones"><a onclick="">Transportistas</a></li>
+            <form method="POST" name="tablas">
+                <?php
+                try {
+                    $tablas->execute();
+                    while ($fila = $tablas->fetch(PDO::FETCH_OBJ)) {
+                        echo "<li class='f pantalones'><input type='submit' name='tabla' value='" . strtoupper($fila->TABLE_NAME) . "'></li>";
+                    }
+                } catch (Exception $e) {
+                    echo "<script>console.log('Error Categorías. " . $e . "')</script>";
+                }
+                ?>
+            </form>
         </ul>
     </header>
     <main>
@@ -194,36 +236,42 @@
             </div>
             <!-- Ordenar precio, talla, marca  -->
         </div>
-        <div class="container">
-            <div class="row">
-                <div class="tabla col s12 m12">
-                    <table class="striped highlight centered">
+        <div class="row">
+            <div class="tabla col s12 m12">
+                <form id="tabla" method="POST" name="<?php echo $nombreTabla; ?>">
+                    <table class="highlight centered">
                         <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Item Name</th>
-                                <th>Item Price</th>
-                            </tr>
+                            <?php
+                            echo "<tr>";
+                            try {
+                                $columnas->execute();
+                                while ($fila = $columnas->fetch(PDO::FETCH_OBJ)) {
+                                    echo "<th>" . $fila->COLUMN_NAME . "</th>";
+                                }
+                            } catch (Exception $e) {
+                                echo "<script>console.log('Error Categorías. " . $e . "')</script>";
+                            }
+                            echo "</tr>";
+                            ?>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Alvin</td>
-                                <td>Eclair</td>
-                                <td>$0.87</td>
-                            </tr>
-                            <tr>
-                                <td>Alan</td>
-                                <td>Jellybean</td>
-                                <td>$3.76</td>
-                            </tr>
-                            <tr>
-                                <td>Jonathan</td>
-                                <td>Lollipop</td>
-                                <td>$7.00</td>
-                            </tr>
+                            <?php
+                            try {
+                                $info->execute();
+                                while ($fila = $info->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
+                                    echo "<tr>";
+                                    foreach ($fila as $value) {
+                                        echo "<td><input class='browser-default' type='text' value='".$value."'" . $value . "></td>";
+                                    }
+                                    echo "</tr>";
+                                }
+                            } catch (Exception $e) {
+                                echo "<script>console.log('Error Categorías. " . $e . "')</script>";
+                            }
+                            ?>
                         </tbody>
                     </table>
-                </div>
+                </form>
             </div>
         </div>
     </main>

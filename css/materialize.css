@@ -2921,12 +2921,14 @@ table.striped > tbody > tr > td {
   border-radius: 0;
 }
 
-table.highlight > tbody > tr {
+table.highlight > tbody > tr,
+table.highlight > tbody > tr input {
   -webkit-transition: background-color .25s ease;
   transition: background-color .25s ease;
 }
 
-table.highlight > tbody > tr:hover {
+table.highlight > tbody > tr:hover,
+table.highlight > tbody > tr:hover input {
   background-color: #f2f2f2;
 }
 
