@@ -7,7 +7,7 @@ try {
     $tablas = $bd->prepare('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = "proyectotiendaropa_carlosp"');
     $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "cesta"');
     $nombreTabla = "cesta";
-    $info =  $bd->prepare('SELECT * FROM '.$nombreTabla.'', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    $info =  $bd->prepare('SELECT * FROM ' . $nombreTabla . '', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
     if (isset($_REQUEST['tabla'])) {
         $nombreTabla = $_REQUEST['tabla'];
         $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
@@ -136,16 +136,9 @@ try {
         .browser-default * {
             font-weight: bold;
         }
-        table td{
-            padding: 0px;
-        }
-        table input{
+
+        table td {
             padding: 15px 0px;
-            text-align: center;
-            border: none;
-            width: 100%;
-            height: 100%;
-            font-size: 14px;
         }
     </style>
     <script>
@@ -261,7 +254,7 @@ try {
                                 while ($fila = $info->fetch(PDO::FETCH_NUM, PDO::FETCH_ORI_NEXT)) {
                                     echo "<tr>";
                                     foreach ($fila as $value) {
-                                        echo "<td><input class='browser-default' type='text' value='".$value."'" . $value . "></td>";
+                                        echo "<td contenteditable='true'>" . $value . "</td>";
                                     }
                                     echo "</tr>";
                                 }
