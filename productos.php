@@ -26,7 +26,7 @@ try {
         }
         if (!$flag) {
             $_SESSION['cesta'][] = $newCesta;
-        } 
+        }
     }
     if (isset($_REQUEST['categoria'])) {
         setcookie('flag_categoria', "0", time() + (86400 * 30));
@@ -220,7 +220,7 @@ try {
             transition: top 1s;
         }
 
-        #error{
+        #error {
             position: fixed;
             padding: 40px;
             top: 40%;
@@ -269,7 +269,13 @@ try {
                         <a href="index.php" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
                             <li><a href="cesta.php">Cesta</a></li>
-                            <li><a href="login.php">Iniciar Sesión</a></li>
+                            <?php
+                            if ($_SESSION['usuario'] != "") {
+                                echo '<li><a href="cuenta.php">' . $_SESSION['usuario'] . '</a></li>';
+                            } else {
+                                echo '<li><a href="login.php">Iniciar Sesión</a></li>';
+                            }
+                            ?>
                         </ul>
                     </div>
                 </div>

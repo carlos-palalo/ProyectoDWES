@@ -1,5 +1,43 @@
 <!DOCTYPE html>
 <html>
+<?php
+try {
+    session_start();
+    require "conexion.php";
+    $_SESSION['usuario'] = "";
+    $_SESSION['flagAdmin'] = false;
+    if (isset($_REQUEST['btn-iniciar'])) {
+        $flagUser = false;
+        $flagAdmin = false;
+        $usuarios = $bd->prepare('SELECT username,password,tipo FROM usuario');
+        $user = htmlspecialchars($_REQUEST['username']);
+        $contraseña = sha1(htmlspecialchars($_REQUEST['password']));
+        $usuarios->execute();
+        while ($fila = $usuarios->fetch(PDO::FETCH_OBJ)) {
+            if ($fila->username == $user && $fila->password == $contraseña) {
+                $flagUser = true;
+                if ($fila->tipo == "admin") {
+                    $flagAdmin = true;
+                }
+            }
+        }
+        if ($flagUser)
+            $_SESSION['usuario'] = $user;
+        if ($flagAdmin)
+            $_SESSION['flagAdmin'] = true;
+        
+        echo $_SESSION['flagAdmin'];
+    }
+    if (isset($_REQUEST['btn-registro'])) {
+        $usuario = htmlspecialchars($_REQUEST['username-r']);
+        $email = htmlspecialchars($_REQUEST['correo-r']);
+        $tlf = htmlspecialchars($_REQUEST['tlf-r']);
+        $contraseña = htmlspecialchars($_REQUEST['password-r']);
+    }
+} catch (PDOException $e) {
+    echo "Error - " . $e->getMessage();
+}
+?>
 
 <head>
     <meta charset="UTF-8">
@@ -79,8 +117,34 @@
             border: 1px solid black !important;
             box-shadow: 0 0 0 2px black !important;
         }
+
+        #btn-ini,
+        #registro {
+            display: none;
+        }
     </style>
     <script>
+        function cambiar(elemento) {
+            var inicio = document.getElementById("inicio");
+            var registro = document.getElementById("registro");
+            var btn_ini = document.getElementById("btn-ini");
+            var btn_reg = document.getElementById("btn-reg");
+
+            switch (elemento.id) {
+                case "btn-ini":
+                    inicio.style.display = "block";
+                    btn_ini.style.display = "none";
+                    registro.style.display = "none";
+                    btn_reg.style.display = "block";
+                    break;
+                case "btn-reg":
+                    inicio.style.display = "none";
+                    btn_ini.style.display = "block";
+                    registro.style.display = "block";
+                    btn_reg.style.display = "none";
+                    break;
+            }
+        }
     </script>
 </head>
 
@@ -88,7 +152,6 @@
     <header>
         <div class="navbar-fixed">
             <nav class="top-nav">
-
                 <div class="container">
                     <div class="row">
                         <div class="nav-wrapper col s12 m12">
@@ -105,36 +168,40 @@
     <main>
         <div class="container">
             <div class="row">
-                <form class="formulario" name="login" id="login">
+                <form class="formulario" id="login" method="POST">
                     <p class="titulo">Bienvenido</p>
-                    <div class="input-field">
-                        <input placeholder="Correo Electrónico*" id="correo" name="correo" type="email" required>
+                    <div id="inicio">
+                        <div class="input-field">
+                            <input placeholder="Nombre de usuario*" name="username" type="text" pattern="^[a-z0-9_-]{3,16}$" title="Debe tener entre 3 y 16 letras minúsculas, números o carácteres especiales (_ -)" required>
+                        </div>
+                        <div class="input-field">
+                            <input name="password" type="password" placeholder="Contraseña*" required>
+                        </div>
+                        <button class="btn black lighten-1" type="submit" name="btn-iniciar">Iniciar sesión</button>
                     </div>
-                    <div class="input-field">
-                        <input id="password" name="password" type="password" placeholder="Contraseña*" required>
-                    </div>
-                    <button class="btn black lighten-1" type="iniciar" name="iniciar">Iniciar sesión</button>
-                    <button class="btn white lighten-1 black-text" type="submit" name="submit">Iniciar sesión</button>
+                    <button type="button" id="btn-ini" class="btn white lighten-1 black-text" name="iniciar" onclick="cambiar(this)">Iniciar sesión</button>
                 </form>
                 <hr>
-                <form class="formulario" name="register" id="register">
+                <form class="formulario" id="register" method="POST">
                     <p class="titulo">Soy nuevo/a</p>
-                    <div class="input-field">
-                        <input placeholder="Nombre de Usuario*" id="username" name="username" type="text" required>
+                    <div id="registro">
+                        <div class="input-field">
+                            <input placeholder="Nombre de Usuario*" name="username-r" type="text" pattern="^[a-z0-9_-]{3,16}$" title="Debe tener entre 3 y 16 letras minúsculas, números o carácteres especiales (_ -)" required>
+                        </div>
+                        <div class="input-field">
+                            <input placeholder="Correo Electrónico*" name="correo-r" type="email" pattern="^[^@]+@[^@]+\.[a-zA-Z]{2,}$" title='Formato válido: email@ejemplo.com' required>
+                        </div>
+                        <div class="input-field">
+                            <input placeholder="Teléfono (opcional)" name="tlf-r" type="tel" pattern="\d{9}" title="Introduce un número de teléfono de 9 dígitos válido">
+                        </div>
+                        <div class="input-field">
+                            <input placeholder="Contraseña*" name="password-r" type="password" pattern="^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$" title="La contraseña debe tener al entre 8 y 16 caracteres, al menos un dígito, al menos una minúscula y al menos una mayúscula." required>
+                        </div>
+                        <p>Al crear una cuenta, aceptas los <a href="#">términos y condiciones</a> y <a href="#">la política
+                                de privacidad</a></p>
+                        <button class="btn black lighten-1" type="submit" name="btn-registro">Registrarse</button>
                     </div>
-                    <div class="input-field">
-                        <input placeholder="Correo Electrónico*" id="correo" name="correo" type="email" required>
-                    </div>
-                    <div class="input-field">
-                        <input placeholder="Teléfono (opcional)" id="tlf" name="tlf" type="tel">
-                    </div>
-                    <div class="input-field">
-                        <input placeholder="Contraseña*" id="password" name="password" type="password" required>
-                    </div>
-                    <p>Al crear una cuenta, aceptas los <a href="#">términos y condiciones</a> y <a href="#">la política
-                            de privacidad</a></p>
-                    <button class="btn black lighten-1" type="submit" name="registro">Registrarse</button>
-                    <button class="btn white lighten-1 black-text" type="submit" name="submit">Registrarse</button>
+                    <button type="button" id="btn-reg" class="btn white lighten-1 black-text" name="registro" onclick="cambiar(this)">Registrarse</button>
                 </form>
             </div>
         </div>

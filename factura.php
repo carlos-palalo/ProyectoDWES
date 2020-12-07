@@ -128,7 +128,13 @@
                             <a href="index.html" class="brand-logo">Roupalia</a>
                             <ul id="nav-mobile" class="right hide-on-med-and-down">
                                 <li><a href="productos.php">Productos</a></li>
-                                <li><a href="login.php">Iniciar Sesión</a></li>
+                                <?php
+                                if ($_SESSION['usuario'] != "") {
+                                    echo '<li><a href="cuenta.php">' . $_SESSION['usuario'] . '</a></li>';
+                                } else {
+                                    echo '<li><a href="login.php">Iniciar Sesión</a></li>';
+                                }
+                                ?>
                             </ul>
                         </div>
                     </div>

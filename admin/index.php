@@ -28,9 +28,80 @@ try {
             $info =  $bd->prepare('SELECT * FROM ' . $nombreTabla . '', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
         }
     }
+    if (isset($_REQUEST['btn-eliminar'])) {
+        $nombreTabla = $_REQUEST['tabla_name'];
+        if (strcasecmp($nombreTabla, "cesta") != 0 && strcasecmp($nombreTabla, "pedido") != 0) {
+            $id = htmlspecialchars($_REQUEST['id-eliminar']);
+            $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
+            $columnas->execute();
+            $fila = $columnas->fetch(PDO::FETCH_OBJ);
+            $cad = "DELETE FROM " . $nombreTabla . " WHERE " . $fila->COLUMN_NAME . " = " . $id;
+            $eliminar = $bd->prepare($cad);
+            $eliminar->execute();
+            echo $cad;
+            if ($eliminar->rowCount() != 0) {
+                echo "<script>alert('Eliminación satisfactoria');</script>";
+            } else {
+                echo "<script>alert('No se ha podido eliminar. El id depende de otra tabla');</script>";
+            }
+        } else {
+            echo "<script>alert('No puedes eliminar de la tabla " . strtoupper($nombreTabla) . "');</script>";
+        }
+        $info =  $bd->prepare('SELECT * FROM ' . $nombreTabla . '', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    }
+    if (isset($_REQUEST['btn-insertar'])) {
+        $nombreTabla = $_REQUEST['tabla_name'];
+        $numColumn = $_REQUEST['num_column'];
+        $cad = "INSERT INTO " . $nombreTabla . " (";
+        $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
+
+        $columnas->execute();
+        $columnas->fetch(PDO::FETCH_OBJ);
+        $columnIni = 0;
+        while ($fila = $columnas->fetch(PDO::FETCH_OBJ)) {
+            if ($columnIni == 0) {
+                $cad .= $fila->COLUMN_NAME;
+                $columnIni++;
+            } else
+                $cad .= "," . $fila->COLUMN_NAME;
+        }
+
+        $cad .= ") VALUES (";
+        $columnas->execute();
+        $columnas->fetch(PDO::FETCH_OBJ);
+        $flag = false;
+        $columnIni = 0;
+        while ($fila = $columnas->fetch(PDO::FETCH_OBJ)) {
+            $col = $fila->COLUMN_NAME;
+            $request = htmlspecialchars($_REQUEST[$col]);
+            if ($request != "") {
+                if ($columnIni == 0) {
+                    $cad .= "'" . $request . "'";
+                    $columnIni++;
+                } else
+                    $cad .= ",'" . $request . "'";
+            } else {
+                $flag = true;
+                break;
+            }
+        }
+        $cad .= ")";
+        if ($flag == true) {
+            echo "<script>alert('Por favor, rellena todos los campos para insertar una fila');</script>";
+        } else {
+            $insert = $bd->prepare($cad);
+            $insert->execute();
+            if ($insert->rowCount() != 0) {
+                echo "<script>alert('Inserción de fila realizada con éxito!');</script>";
+            } else {
+                echo "<script>alert('Error al introducir datos. No se ha podido insertar la fila');</script>";
+            }
+        }
+        $info =  $bd->prepare('SELECT * FROM ' . $nombreTabla . '', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
+    }
     if (isset($_REQUEST['btn-actualizar'])) {
         $nombreTabla = $_REQUEST['tabla_name'];
-        $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
+        $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
         $flag = false;
         if (strcasecmp($nombreTabla, "cesta") == 0 || strcasecmp($nombreTabla, "pedido") == 0) {
             echo "<script>alert('No puedes modificar la tabla " . strtoupper($nombreTabla) . "');</script>";
@@ -43,17 +114,21 @@ try {
                 $id = $fila->COLUMN_NAME;
                 while ($fila = $columnas->fetch(PDO::FETCH_OBJ)) {
                     $request = $fila->COLUMN_NAME . $i;
-                    if ($_REQUEST[$request] != "") {
+                    if (htmlspecialchars($_REQUEST[$request]) != "") {
                         if ($cont == 0) {
-                            $cad .= $fila->COLUMN_NAME . " = '" . $_REQUEST[$request] . "'";
+                            $cad .= $fila->COLUMN_NAME . " = '" . htmlspecialchars($_REQUEST[$request]) . "'";
                             $cont++;
                         } else {
-                            $cad .= ", " . $fila->COLUMN_NAME . " = '" . $_REQUEST[$request] . "'";
+                            if ($fila->COLUMN_NAME == "password") {
+                                $cad .= ", " . $fila->COLUMN_NAME . " = '" . sha1(htmlspecialchars($_REQUEST[$request])) . "'";
+                            } else {
+                                $cad .= ", " . $fila->COLUMN_NAME . " = '" . htmlspecialchars($_REQUEST[$request]) . "'";
+                            }
                         }
                     }
                 }
                 $request = $id . $i;
-                $cad .= " WHERE " . $id . " = '" . $_REQUEST[$request] . "'";
+                $cad .= " WHERE " . $id . " = '" . htmlspecialchars($_REQUEST[$request]) . "'";
                 $actu = $bd->prepare($cad);
                 $actu->execute();
                 if ($actu->rowCount() != 0) {
@@ -69,7 +144,7 @@ try {
         }
         $info =  $bd->prepare('SELECT * FROM ' . $nombreTabla . '', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
     }
-    $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
+    $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
 } catch (PDOException $e) {
     echo "Error - " . $e->getMessage();
 }
@@ -121,11 +196,8 @@ try {
 
         .filtro button {
             padding: 3px 0px;
-            width: 150px;
-        }
-
-        .filtro button:nth-child(2) {
-            float: right;
+            min-width: fit-content;
+            width: 100%;
         }
 
         table {
@@ -239,6 +311,11 @@ try {
             background-color: white;
             z-index: 1;
         }
+
+        input {
+            margin-bottom: 5px !important;
+            text-align: center;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -256,15 +333,20 @@ try {
                     <div class="nav-wrapper">
                         <a href="../index.php" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
-                            <li><a href="login.html">Admin</a></li>
-                        </ul>
+                            <?php
+                            if ($_SESSION['usuario'] != "") {
+                                echo '<li><a href="cuenta.php">' . $_SESSION['usuario'] . '</a></li>';
+                            } else {
+                                echo '<li><a href="login.php">Iniciar Sesión</a></li>';
+                            }
+                            ?> </ul>
                     </div>
                 </div>
             </nav>
         </div>
         <ul class="side-nav left fixed">
             <li class="logo">
-                <a id="logo-container" href="" class="brand-logo">
+                <a id="logo-container" href="../index.php" class="brand-logo">
                     <img src="../img/logo.png" alt="Logo">
                 </a>
             </li>
@@ -313,8 +395,10 @@ try {
                                 <option value="DESC">Descendente</option>
                             </select>
                         </div>
-                        <div class="filtro col s12 m4">
+                        <div class="filtro col s12 m2">
                             <button class="btn white black-text lighten-1" type="submit" name="btn-ordenar">Ordenar</button>
+                        </div>
+                        <div class="filtro col s12 m2">
                             <button class="btn white black-text lighten-1" type="submit" name="btn-actualizar">Actualizar</button>
                         </div>
                     </div>
@@ -322,7 +406,7 @@ try {
                         <?php
                         echo '<input type="hidden" name="tabla_name" value="' . $nombreTabla . '">';
                         ?>
-                        <div class="filtro col s12 m4">
+                        <div class="filtro col s12 m3">
                             <select name="columna" class="browser-default">
                                 <option value="" selected>Buscar por...</option>
                                 <?php
@@ -337,14 +421,90 @@ try {
                                 ?>
                             </select>
                         </div>
-                        <div class="filtro col s12 m4">
+                        <div class="filtro col s12 m3">
                             <input type="text" name="campo" placeholder="Introduce el valor">
                         </div>
-                        <div class="filtro col s12 m4">
+                        <div class="filtro col s12 m2">
                             <button class="btn white black-text lighten-1" type="submit" name="btn-buscar">Buscar</button>
-                            <button class="btn white black-text lighten-1" type="submit" name="btn-eliminar" disabled>Eliminar</button>
+                        </div>
+                        <div class="filtro col s12 m2">
+                            <?php
+                            try {
+                                $columnas->execute();
+                                $fila = $columnas->fetch(PDO::FETCH_OBJ);
+                                echo "<input type='number' name='id-eliminar' placeholder='" . $fila->COLUMN_NAME . "'>";
+                            } catch (PDOException $e) {
+                                echo "Error - " . $e->getMessage();
+                            }
+                            ?>
+                        </div>
+                        <div class="filtro col s12 m2">
+                            <button class="btn white black-text lighten-1" type="submit" name="btn-eliminar">Eliminar</button>
                         </div>
                     </div>
+
+                    <?php
+                    if (strcasecmp($nombreTabla, "cesta") != 0 && strcasecmp($nombreTabla, "pedido") != 0) {
+                        echo '<div class="row">
+                        <input type="hidden" name="tabla_name" value="' . $nombreTabla . '">';
+                        try {
+                            $columnas->execute();
+                            $columnas->fetch(PDO::FETCH_OBJ);
+                            echo "<input type='hidden' name='num_column' value='" . $columnas->rowCount() . "'>";
+                            while ($fila = $columnas->fetch(PDO::FETCH_OBJ)) {
+                                echo "<div class='filtro col s12 m2'>
+                                    <input type='text' name='" . $fila->COLUMN_NAME . "' placeholder='" . $fila->COLUMN_NAME . "' pattern='";
+                                switch ($fila->COLUMN_TYPE) {
+                                    case "int":
+                                        if ($fila->COLUMN_NAME == "tlf")
+                                            echo "\d{9}' title='Introduce un número de teléfono de 9 dígitos válido'";
+                                        else
+                                            echo "\d+' title='Introduce un valor entero'";
+                                        break;
+                                    case "varchar(45)":
+                                    case "varchar(40)":
+                                        switch ($fila->COLUMN_NAME) {
+                                            case "email":
+                                                echo "^[^@]+@[^@]+\.[a-zA-Z]{2,}$' title='Formato válido: email@ejemplo.com'";
+                                                break;
+                                            case "username":
+                                                echo "^[a-z0-9_-]{3,16}$' title='Debe tener entre 3 y 16 letras minúsculas, números o carácteres especiales (_ -)'";
+                                                break;
+                                            case "password":
+                                                echo "^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$' title='La contraseña debe tener al entre 8 y 16 caracteres, al menos un dígito, al menos una minúscula y al menos una mayúscula.'";
+                                                break;
+                                            default:
+                                                echo "[a-zA-Z]+' title='Introduce el nombre del producto'";
+                                                break;
+                                        }
+                                        break;
+                                    case "varchar(3)":
+                                        echo "(([X]{0,2})|([3-5][X]))?([S]|[M]|[L])' title='Introduce una talla válida (XXS... M... XXL) / (3-5XS..L)'";
+                                        break;
+                                    case "enum('H','M')":
+                                        echo "[H]|[M]|[h]|[m]' title='Introduce H/h (hombre) o M/m (Mujer)'";
+                                        break;
+                                    case "enum('admin','normal')":
+                                        echo "(admin)|(normal)' title='Introduce: admin/normal'";
+                                        break;
+                                    case "datetime":
+                                        echo "^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$' title='Formato: YYYY-MM-DD hh:mm:ss'";
+                                        break;
+                                    case "double":
+                                        echo "\d+([\.]\d+)?' title='Formato: 99.99'";
+                                        break;
+                                }
+                                echo "></div>";
+                            }
+                        } catch (PDOException $e) {
+                            echo "Error - " . $e->getMessage();
+                        }
+                        echo '<div class="filtro col s12 m2">
+                                <button class="btn white black-text lighten-1" type="submit" name="btn-insertar">Insertar</button>
+                            </div>
+                        </div>';
+                    }
+                    ?>
 
                 </div>
                 <!-- Ordenar precio, talla, marca  -->
