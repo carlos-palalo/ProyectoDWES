@@ -186,6 +186,9 @@ try {
             width: 100%;
             border-radius: 5px;
         }
+        .container-product button{
+            padding: 0px;
+        }
 
         .precio {
             font-weight: bold;
@@ -387,7 +390,7 @@ try {
                             $productos_filtrados->execute();
                             while ($fila = $productos_filtrados->fetch(PDO::FETCH_OBJ)) {
                                 echo '
-                        <div class="container-product col s12 m4">
+                        <div class="container-product col s12 m3">
                             <a id="prod' . $fila->id_producto . '" name="prod' . $fila->id_producto . '">
                                 <img src="img/pantalon.jpg" alt="Foto">
                                 <p class="marca">' . $fila->marca . '</p>
