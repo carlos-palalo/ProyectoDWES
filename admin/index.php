@@ -42,7 +42,6 @@ try {
             $cad = "DELETE FROM " . $nombreTabla . " WHERE " . $fila->COLUMN_NAME . " = " . $id;
             $eliminar = $bd->prepare($cad);
             $eliminar->execute();
-            echo $cad;
             if ($eliminar->rowCount() != 0) {
                 echo "<script>alert('Eliminación satisfactoria');</script>";
             } else {
