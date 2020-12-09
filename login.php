@@ -42,13 +42,21 @@ try {
             $tlf = "null";
         }
         $contraseña = htmlspecialchars($_REQUEST['password-r']);
-
+        echo $usuario;
         $cad = 'INSERT INTO USUARIO (email,username,password,tipo,tlf,fecha_creacion) VALUES("' . $email . '","' . $usuario . '","' . sha1($contraseña) . '","normal",' . $tlf . ',sysdate())';
         $insert = $bd->prepare($cad);
         $insert->execute();
         if ($insert->rowCount() != 0) {
-            $_SESSION['flagUser'] = true;
-            $_SESSION['usuario'] = $usuario;
+            $usuarios = $bd->prepare('SELECT id_Usuario,username,password,tipo FROM usuario');
+            $usuarios->execute();
+            while ($fila = $usuarios->fetch(PDO::FETCH_OBJ)) {
+                if ($fila->username == $usuario && $fila->password == sha1($contraseña)) {
+                    echo "a";
+                    $_SESSION['flagUser'] = true;
+                    $_SESSION['usuario'] = $usuario;
+                    $_SESSION['id'] = $fila->id_Usuario;
+                }
+            }
             echo "<script>alert('Bienvenido, " . $_SESSION['usuario'] . "')</script>";
             echo '<script>location.href="productos.php"</script>';
         } else
