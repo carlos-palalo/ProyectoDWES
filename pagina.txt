@@ -1,3 +1,0 @@
-https://materializecss.com/table.html
-
-desplegar dados en azure devops y hacer guia para tontos
