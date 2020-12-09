@@ -1,5 +1,61 @@
 <!DOCTYPE html>
 <html>
+<?php
+try {
+    session_start();
+    require "conexion.php";
+    if (!$_SESSION['flagUser']) {
+        echo '<script>alert("Necesitas estar logueado para realizar la factura. Redirigiendote");</script>';
+        echo '<script>location.href="login.php"</script>';
+    }
+    if(empty($_SESSION['cesta'])){
+        echo '<script>alert("No tienes nada en la cesta. Volviendo a productos");</script>';
+        echo '<script>location.href="productos.php"</script>';
+    }
+    $total = 0;
+    $productos = $bd->prepare("SELECT * FROM producto");
+    $productos->execute();
+    while ($fila = $productos->fetch(PDO::FETCH_OBJ)) {
+        foreach ($_SESSION['cesta'] as $producto) {
+            if ($producto['id'] == $fila->id_producto) {
+                $total += $fila->pvp * $producto['cantidad'];
+            }
+        }
+    }
+    $total += $total * 21 / 100;
+    if (isset($_REQUEST['comprar'])) {
+        $error = false;
+        $idcesta = $bd->prepare("SELECT MAX(id_cesta) AS id FROM cesta");
+        $idcesta->execute();
+        $idUlt = $idcesta->fetch(PDO::FETCH_OBJ);
+        $idAct = $idUlt->id + 1;
+        foreach ($_SESSION['cesta'] as $producto) {
+            $cad = "INSERT INTO cesta VALUES (" . $idAct . "," . $producto['id'] . "," . $producto['cantidad'] . ")";
+            $insercionCesta = $bd->prepare($cad);
+            $insercionCesta->execute();
+            if ($insercionCesta->rowCount() == 0) {
+                echo '<script>alert("Error al insertar en la Cesta");</script>';
+                $error = true;
+            }
+        }
+        $cad = "INSERT INTO PEDIDO (fecha_compra,precio_final,destino,metodo_pago,numTarjeta,id_Usuario,id_Cesta) VALUES (sysdate()," . $total . ",'" . htmlspecialchars($_REQUEST['direccion']) . "','" . $_REQUEST['metodo_pago'] . "','" . htmlspecialchars($_REQUEST['numTarjeta']) . "'," . $_SESSION['id'] . "," . $idAct . ")";
+        $insercionPedido = $bd->prepare($cad);
+        $insercionPedido->execute();
+        if ($insercionPedido->rowCount() == 0) {
+            echo '<script>alert("Error al insertar en Pedidos");</script>';
+            $error = true;
+        }
+
+        if (!$error) {
+            echo '<script>alert("Gracias por confiar en nosotros");</script>';
+            $_SESSION['cesta'] = array();
+            echo '<script>location.href="productos.php"</script>';
+        }
+    }
+} catch (Exception $e) {
+    echo "<script>console.log('" . $e . "')</script>";
+}
+?>
 
 <head>
     <meta charset="UTF-8">
@@ -52,18 +108,6 @@
             padding-left: 20px;
             padding-right: 20px;
             padding-bottom: 15px;
-        }
-
-        .final {
-            background-color: white;
-            margin-top: 50px;
-            padding: 50px 0px !important;
-        }
-
-        .final .titulo {
-            text-align: center;
-            font-size: x-large;
-            font-weight: bold;
         }
 
         form p {
@@ -125,7 +169,7 @@
                 <div class="container">
                     <div class="row">
                         <div class="nav-wrapper col s12 m12">
-                            <a href="index.html" class="brand-logo">Roupalia</a>
+                            <a href="productos.php" class="brand-logo">Roupalia</a>
                             <ul id="nav-mobile" class="right hide-on-med-and-down">
                                 <li><a href="productos.php">Productos</a></li>
                                 <?php
@@ -145,54 +189,38 @@
     <main>
         <div class="container">
             <div class="row">
-                <form class="formulario" name="login" id="login">
+                <form class="formulario" method="POST">
                     <p class="titulo col s12 m12">Factura</p>
                     <div class="input-field col s12 m4">
-                        <input placeholder="Nombre*" id="nombre" name="nombre" type="text" required>
+                        <input placeholder="Nombre*" name="nombre" pattern="^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[\s]*)+$" title="Ejemplo: Juán Gómez" type="text" required>
                     </div>
                     <div class="input-field col s12 m8">
-                        <input id="apellidos" name="apellidos" type="text" placeholder="Apellidos*" required>
+                        <input id="apellidos" name="apellidos" type="text" placeholder="Apellidos*" pattern="^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[\s]*)+$" title="Ejemplo: Palacios Alonso" required>
                     </div>
                     <div class="input-field col s12 m12">
                         <input id="direccion" name="direccion" type="text" placeholder="Dirección*" required>
                     </div>
-                    <div class="input-field col s12 m4">
-                        <input id="cod_postal" name="cod_postal" type="number" placeholder="Código postal*" required>
-                    </div>
-                    <div class="input-field col s12 m4">
-                        <input id="ciudad" name="ciudad" type="text" placeholder="Ciudad*" required>
-                    </div>
-                    <div class="input-field col s12 m4">
-                        <input id="provincia" name="provincia" type="text" placeholder="Provincia*" required>
-                    </div>
-                    <div class="input-field col s12 m12">
-                        <input id="pais" name="pais" type="text" placeholder="País*" required>
-                    </div>
                     <div class="metodo_pago">
                         <p class="col s12 m12">Método de pago</p>
                         <div class="radio col s12 m12">
-                            <input type="radio" id="contrareembolso" name="metodo_pago">
+                            <input type="radio" id="contrareembolso" name="metodo_pago" value="contrareembolso" onclick="document.getElementById('numTarjeta').removeAttribute('required')" required>
                             <label for="contrareembolso">Contra reembolso</label>
                         </div>
                         <div class="radio col s12 m4">
-                            <input type="radio" id="tarjeta" name="metodo_pago">
+                            <input type="radio" id="tarjeta" name="metodo_pago" value="tarjeta" onclick="document.getElementById('numTarjeta').setAttribute('required','')" required>
                             <label for="tarjeta">Tarjeta</label>
                         </div>
                         <div class="input-field col s12 m8">
-                            <input id="pais" name="pais" type="text" placeholder="Número Tarjeta" required>
+                            <input id="numTarjeta" name="numTarjeta" type="text" pattern="^[0-9]{15,16}|(([0-9]{4}-){3}[0-9]{3,4})$" title="Número tarjeta entre 15 y 16 digitos con formato: 1234-1234-1234-1234-123 / 1234-1234-1234-1234 / 123456789012345" placeholder="Número Tarjeta">
                         </div>
                     </div>
                     <div class="importe col s12 m12">
-                        <p class="col s12 m12">Importe Total:</p>
-
+                        <p class="col s12 m12">Importe Total: <?php echo number_format($total, 2) . " €"; ?></p>
                     </div>
                     <div class="boton">
-                        <button class="btn white lighten-1 black-text" type="submit" name="submit">Comprar</button>
+                        <button class="btn white lighten-1 black-text" type="submit" name="comprar">Comprar</button>
                     </div>
                 </form>
-                <div class="final col s12 m12">
-                    <div class="titulo">Gracias por confiar en nosotros</div>
-                </div>
             </div>
         </div>
     </main>

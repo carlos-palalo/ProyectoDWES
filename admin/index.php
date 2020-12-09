@@ -4,6 +4,10 @@
 try {
     session_start();
     require "../conexion.php";
+    if (!$_SESSION['flagAdmin']) {
+        echo '<script>alert("No dispones de los permisos necesarios para acceder")</script>';
+        echo '<script>location.href="../productos.php"</script>';
+    }
     $tablas = $bd->prepare('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = "proyectotiendaropa_carlosp"');
     $nombreTabla = "cesta";
     $info =  $bd->prepare('SELECT * FROM ' . $nombreTabla . '', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
@@ -331,22 +335,24 @@ try {
             <nav class="top-nav">
                 <div class="container">
                     <div class="nav-wrapper">
-                        <a href="../index.php" class="brand-logo">Roupalia</a>
+                        <a href="../productos.php" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
+                            <li><a href="../productos.php">Productos</a></li>
                             <?php
                             if ($_SESSION['usuario'] != "") {
-                                echo '<li><a href="cuenta.php">' . $_SESSION['usuario'] . '</a></li>';
+                                echo '<li><a href="../cuenta.php">' . $_SESSION['usuario'] . '</a></li>';
                             } else {
                                 echo '<li><a href="login.php">Iniciar Sesión</a></li>';
                             }
-                            ?> </ul>
+                            ?>
+                        </ul>
                     </div>
                 </div>
             </nav>
         </div>
         <ul class="side-nav left fixed">
             <li class="logo">
-                <a id="logo-container" href="../index.php" class="brand-logo">
+                <a id="logo-container" href="../productos.php" class="brand-logo">
                     <img src="../img/logo.png" alt="Logo">
                 </a>
             </li>

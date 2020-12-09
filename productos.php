@@ -266,7 +266,7 @@ try {
             <nav class="top-nav">
                 <div class="container">
                     <div class="nav-wrapper">
-                        <a href="index.php" class="brand-logo">Roupalia</a>
+                        <a href="productos.php" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
                             <li><a href="cesta.php">Cesta</a></li>
                             <?php

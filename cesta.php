@@ -10,9 +10,24 @@ try {
     $cad = 'SELECT * FROM producto WHERE id_producto IN (';
     $where_cont = 0;
     $aux = array();
+    if (isset($_REQUEST['btn-comenzar'])) {
+        if (!$_SESSION['flagUser']) {
+            echo '<script>alert("Necesitas estar logueado para efectuar el pedido. Redirigiendote");</script>';
+            echo '<script>location.href="login.php"</script>';
+        }
+        for ($i = 0; $i < count($_SESSION['cesta']); $i++) {
+            $requestId = 'product_id' . $_SESSION['cesta'][$i]['id'];
+            $requestCantidad = 'cantidad' . $_SESSION['cesta'][$i]['id'];
+            if ($_SESSION['cesta'][$i]['id'] == $_REQUEST[$requestId]) {
+                $_SESSION['cesta'][$i]['cantidad'] = $_REQUEST[$requestCantidad];
+            }
+        }
+        echo '<script>location.href="factura.php"</script>';
+    }
     if (isset($_REQUEST['btn-eliminar'])) {
         for ($i = 0; $i < count($_SESSION['cesta']); $i++) {
-            if ($_SESSION['cesta'][$i]['id'] != $_REQUEST['product_id']) {
+            $request = "product_id" . $_REQUEST['btn-eliminar'];
+            if ($_SESSION['cesta'][$i]['id'] != $_REQUEST[$request]) {
                 $aux[] = $_SESSION['cesta'][$i];
             }
         }
@@ -31,6 +46,7 @@ try {
         }
     }
     $cad .= ')';
+    #print_r($_SESSION['cesta']);
     $productos = $bd->prepare($cad);
 } catch (Exception $e) {
     echo "<script>console.log('" . $e . "')</script>";
@@ -163,9 +179,10 @@ try {
             var instances = M.FormSelect.init(elems);
         });
 
-        function cambiar() {
+        function cambiar(elemento) {
             var cantidad = document.getElementsByTagName('select');
             var productos = document.getElementsByClassName('product');
+            var ids = document.getElementsByClassName("ids");
             var numArticulos = 0,
                 subtotal = 0,
                 total = 0;
@@ -185,6 +202,8 @@ try {
                 document.getElementById('total').innerText = (subtotal * 121 / 100).toFixed(2) + ' €';
                 document.getElementById('articulos').innerText = 'Mi cesta (' + numArticulos + ' artículos)';
             }
+            //El input con el mismo id que el nombre del elemento, le modifico el valor
+            document.getElementById(elemento.name).value = elemento.value;
         }
 
         function comprobar() {
@@ -202,7 +221,7 @@ try {
             <nav class="top-nav">
                 <div class="container">
                     <div class="nav-wrapper">
-                        <a href="index.php" class="brand-logo">Roupalia</a>
+                        <a href="productos.php" class="brand-logo">Roupalia</a>
                         <ul id="nav-mobile" class="right hide-on-med-and-down">
                             <li><a href="productos.php">Productos</a></li>
                             <?php
@@ -254,12 +273,12 @@ try {
 
                                     echo '
                                                 <p class="precio" value="' . $fila->pvp . '">' . $fila->pvp . ' €</p>
-                                                <input type="hidden" name="product_id" value="' . $fila->id_producto . '">
-                                                <button class="btn white black-text lighten-1" name="btn-eliminar">Eliminar</button>
+                                                <input type="hidden" name="product_id' . $fila->id_producto . '" value="' . $fila->id_producto . '">
+                                                <button class="btn white black-text lighten-1" name="btn-eliminar" value="' . $fila->id_producto . '">Eliminar</button>
                                             </div>
                                             <div class="container-select col s12 m3">
                                                 <label>Cantidad</label>
-                                                <select name="cantidad' . $fila->id_producto . '" class="browser-default" onchange="cambiar()">';
+                                                <select name="cantidad' . $fila->id_producto . '" class="browser-default" onchange="cambiar(this)">';
                                     #<button class="btn white black-text lighten-1" name="btn-eliminar" onclick="eliminar(this)">Eliminar</button>
 
                                     for ($i = 1; $i <= $fila->cantidad; $i++) {
@@ -315,7 +334,15 @@ try {
                             }
                             ?>
                         </div>
-                        <a href="factura.php" class="col s12 m12 btn white black-text lighten-1">COMENZAR PEDIDO</a>
+                        <form method="POST">
+                            <?php
+                            foreach ($_SESSION['cesta'] as $producto) {
+                                echo '<input class="ids" type="hidden" name="product_id' . $producto['id'] . '" value="' . $producto['id'] . '">';
+                                echo '<input id="cantidad' . $producto['id'] . '" type="hidden" name="cantidad' . $producto['id'] . '" value="' . $producto['cantidad'] . '">';
+                            }
+                            ?>
+                            <button class="btn white black-text lighten-1" type="submit" name="btn-comenzar">COMENZAR PEDIDO</button>
+                        </form>
                     </div>
                 </div>
             </div>

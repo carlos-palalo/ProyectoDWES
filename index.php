@@ -2,6 +2,18 @@
 <?php
 session_start();
 $_SESSION['cesta'] = array();
+if (!isset($_SESSION['flagUser'])) {
+    $_SESSION['flagUser'] = false;
+}
+if (!isset($_SESSION['usuario'])) {
+    $_SESSION['usuario'] = "";
+}
+if (!isset($_SESSION['flagAdmin'])) {
+    $_SESSION['flagAdmin'] = false;
+}
+if (!isset($_SESSION['id'])) {
+    $_SESSION['id'] = "";
+}
 ?>
 <html>
 
@@ -16,72 +28,30 @@ $_SESSION['cesta'] = array();
         body {
             margin: 0px;
             padding: 0px;
+            background-image: url("img/fondo.jpg");
         }
 
-        .logo {
-            padding-top: 30px;
+        .btn-entrar {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -100px;
+            margin-top: -50px;
         }
 
-        .logo a {
-            margin: 0 auto;
-            height: 100% !important;
-            width: 200px !important;
+        .btn-entrar a {
+            font-size: xx-large;
+            text-decoration: none;
+            color: white;
+            background-color: #ee6e73;
+            padding: 30px 50px;
+            border-radius: 20px;
+            transition: background-color, color 1s;
         }
 
-        .logo img {
-            width: 100%;
-        }
-
-        button {
-            width: 100%;
-            font-weight: bold;
-            box-shadow: 0 0 0 2px black !important;
-            border-radius: 0px !important;
-        }
-
-        form button:hover {
-            background-color: black !important;
-            color: white !important;
-            opacity: 0.9;
-        }
-
-        .formulario {
-            width: 500px;
-        }
-
-        .row form {
-            margin: 50px auto 30px;
-            padding-top: 5px;
-            padding-left: 20px;
-            padding-right: 20px;
-            padding-bottom: 15px;
-        }
-
-        form p {
-            font-weight: bold;
-            font-size: medium;
-        }
-
-        form .titulo {
-            font-size: x-large;
-        }
-
-        .input-field {
-            margin: 0px auto;
-            width: 100%;
-            padding-right: 10px;
-        }
-
-        .input-field input {
-            border: none !important;
-            box-shadow: 0 0 0 1px black !important;
-            padding-left: 10px !important;
-        }
-
-        .input-field input:hover,
-        .input-field input:focus {
-            border: 1px solid black !important;
-            box-shadow: 0 0 0 2px black !important;
+        .btn-entrar a:hover {
+            background-color: white;
+            color: black;
         }
     </style>
     <script>
@@ -89,64 +59,7 @@ $_SESSION['cesta'] = array();
 </head>
 
 <body>
-    <header>
-        <div class="navbar-fixed">
-            <nav class="top-nav">
-                <div class="container">
-                    <div class="nav-wrapper">
-                        <a href="index.php" class="brand-logo">Roupalia</a>
-                        <ul id="nav-mobile" class="right hide-on-med-and-down">
-                            <li><a href="productos.php">Productos</a></li>
-                            <?php
-                            if ($_SESSION['usuario'] != "") {
-                                echo '<li><a href="cuenta.php">' . $_SESSION['usuario'] . '</a></li>';
-                            } else {
-                                echo '<li><a href="login.php">Iniciar Sesión</a></li>';
-                            }
-                            ?>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </div>
-    </header>
-    <main>
-        <div class="container">
-            <div class="row">
-                <form class="formulario" name="login" id="login">
-                    <p class="titulo">Bienvenido</p>
-                    <div class="input-field">
-                        <input placeholder="Correo Electrónico*" id="correo" name="correo" type="email" required>
-                    </div>
-                    <div class="input-field">
-                        <input id="password" name="password" type="password" placeholder="Contraseña*" required>
-                    </div>
-                    <button class="btn black lighten-1" type="iniciar" name="iniciar">Iniciar sesión</button>
-                    <button class="btn white lighten-1 black-text" type="submit" name="submit">Iniciar sesión</button>
-                </form>
-                <hr>
-                <form class="formulario" name="register" id="register">
-                    <p class="titulo">Soy nuevo/a</p>
-                    <div class="input-field">
-                        <input placeholder="Nombre de Usuario*" id="username" name="username" type="text" required>
-                    </div>
-                    <div class="input-field">
-                        <input placeholder="Correo Electrónico*" id="correo" name="correo" type="email" required>
-                    </div>
-                    <div class="input-field">
-                        <input placeholder="Teléfono (opcional)" id="tlf" name="tlf" type="tel">
-                    </div>
-                    <div class="input-field">
-                        <input placeholder="Contraseña*" id="password" name="password" type="password" required>
-                    </div>
-                    <p>Al crear una cuenta, aceptas los <a href="#">términos y condiciones</a> y <a href="#">la política
-                            de privacidad</a></p>
-                    <button class="btn black lighten-1" type="submit" name="registro">Registrarse</button>
-                    <button class="btn white lighten-1 black-text" type="submit" name="submit">Registrarse</button>
-                </form>
-            </div>
-        </div>
-    </main>
+    <div class="btn-entrar"><a href="productos.php">Entrar</a></div>
 </body>
 
 </html>

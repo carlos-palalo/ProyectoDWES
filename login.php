@@ -4,35 +4,55 @@
 try {
     session_start();
     require "conexion.php";
-    $_SESSION['usuario'] = "";
-    $_SESSION['flagAdmin'] = false;
+    if ($_SESSION['flagUser']) {
+        echo "<script>alert('Ya estas logueado. Volviendo a productos')</script>";
+        echo '<script>location.href="productos.php"</script>';
+    }
     if (isset($_REQUEST['btn-iniciar'])) {
         $flagUser = false;
         $flagAdmin = false;
-        $usuarios = $bd->prepare('SELECT username,password,tipo FROM usuario');
+        $usuarios = $bd->prepare('SELECT id_Usuario,username,password,tipo FROM usuario');
         $user = htmlspecialchars($_REQUEST['username']);
         $contraseña = sha1(htmlspecialchars($_REQUEST['password']));
         $usuarios->execute();
         while ($fila = $usuarios->fetch(PDO::FETCH_OBJ)) {
             if ($fila->username == $user && $fila->password == $contraseña) {
                 $flagUser = true;
+                $_SESSION['id'] = $fila->id_Usuario;
                 if ($fila->tipo == "admin") {
                     $flagAdmin = true;
                 }
             }
         }
-        if ($flagUser)
+        if ($flagUser) {
+            $_SESSION['flagUser'] = true;
             $_SESSION['usuario'] = $user;
-        if ($flagAdmin)
-            $_SESSION['flagAdmin'] = true;
-        
-        echo $_SESSION['flagAdmin'];
+            echo "<script>alert('Bienvenido, " . $_SESSION['usuario'] . "')</script>";
+            echo '<script>location.href="productos.php"</script>';
+            if ($flagAdmin) {
+                $_SESSION['flagAdmin'] = true;
+            }
+        }
     }
     if (isset($_REQUEST['btn-registro'])) {
         $usuario = htmlspecialchars($_REQUEST['username-r']);
         $email = htmlspecialchars($_REQUEST['correo-r']);
         $tlf = htmlspecialchars($_REQUEST['tlf-r']);
+        if ($tlf == "") {
+            $tlf = "null";
+        }
         $contraseña = htmlspecialchars($_REQUEST['password-r']);
+
+        $cad = 'INSERT INTO USUARIO (email,username,password,tipo,tlf,fecha_creacion) VALUES("' . $email . '","' . $usuario . '","' . sha1($contraseña) . '","normal",' . $tlf . ',sysdate())';
+        $insert = $bd->prepare($cad);
+        $insert->execute();
+        if ($insert->rowCount() != 0) {
+            $_SESSION['flagUser'] = true;
+            $_SESSION['usuario'] = $usuario;
+            echo "<script>alert('Bienvenido, " . $_SESSION['usuario'] . "')</script>";
+            echo '<script>location.href="productos.php"</script>';
+        } else
+            echo "<script>alert('Error al crear el usuario')</script>";
     }
 } catch (PDOException $e) {
     echo "Error - " . $e->getMessage();
@@ -155,7 +175,7 @@ try {
                 <div class="container">
                     <div class="row">
                         <div class="nav-wrapper col s12 m12">
-                            <a href="index.php" class="brand-logo">Roupalia</a>
+                            <a href="productos.php" class="brand-logo">Roupalia</a>
                             <ul id="nav-mobile" class="right hide-on-med-and-down">
                                 <li><a href="productos.php">Productos</a></li>
                             </ul>
