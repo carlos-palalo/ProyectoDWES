@@ -66,6 +66,7 @@ try {
             margin: 0px;
             padding: 0px;
             background-color: whitesmoke;
+            overflow-x: hidden;
         }
 
         .container-product,
