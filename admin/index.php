@@ -36,7 +36,7 @@ try {
         $nombreTabla = $_REQUEST['tabla_name'];
         if (strcasecmp($nombreTabla, "cesta") != 0 && strcasecmp($nombreTabla, "pedido") != 0) {
             $id = htmlspecialchars($_REQUEST['id-eliminar']);
-            $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
+            $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"  order by ordinal_position');
             $columnas->execute();
             $fila = $columnas->fetch(PDO::FETCH_OBJ);
             $cad = "DELETE FROM " . $nombreTabla . " WHERE " . $fila->COLUMN_NAME . " = " . $id;
@@ -56,7 +56,7 @@ try {
         $nombreTabla = $_REQUEST['tabla_name'];
         $numColumn = $_REQUEST['num_column'];
         $cad = "INSERT INTO " . $nombreTabla . " (";
-        $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
+        $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"  order by ordinal_position');
 
         $columnas->execute();
         $columnas->fetch(PDO::FETCH_OBJ);
@@ -104,7 +104,7 @@ try {
     }
     if (isset($_REQUEST['btn-actualizar'])) {
         $nombreTabla = $_REQUEST['tabla_name'];
-        $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
+        $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"  order by ordinal_position');
         $flag = false;
         if (strcasecmp($nombreTabla, "cesta") == 0 || strcasecmp($nombreTabla, "pedido") == 0) {
             echo "<script>alert('No puedes modificar la tabla " . strtoupper($nombreTabla) . "');</script>";
@@ -147,7 +147,7 @@ try {
         }
         $info =  $bd->prepare('SELECT * FROM ' . $nombreTabla . '', array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
     }
-    $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"');
+    $columnas = $bd->prepare('SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "' . $nombreTabla . '"  order by ordinal_position');
 } catch (PDOException $e) {
     echo "Error - " . $e->getMessage();
 }

@@ -60,7 +60,7 @@ try {
         $pedidos = true;
         $cad = 'SELECT num_pedido,fecha_compra,precio_final,fecha_entrega,c.id_cesta,group_concat(id_producto) as id_producto from cesta c, pedido p where c.id_cesta=p.id_cesta and p.id_Usuario =' . $_SESSION['id'];
         $cad .= ' group by num_pedido';
-        $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "pedido" and column_name not in ("destino","metodo_pago","numTarjeta","id_Usuario")');
+        $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "pedido" and column_name not in ("destino","metodo_pago","numTarjeta","id_Usuario")  order by ordinal_position');
         $info = $bd->prepare($cad);
     }
     if (isset($_REQUEST['productos'])) {
@@ -69,7 +69,7 @@ try {
         $pedidos = false;
         $productos = true;
         $cad = 'select p.id_producto, nombre, talla, pvp, marca, sexo, categoria, c.cantidad from producto p, cesta c, pedido u where u.id_Usuario = ' . $_SESSION['id'] . ' and u.id_Cesta = c.id_Cesta and c.id_producto = p.id_producto';
-        $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "producto" and column_name not in ("precio_Original","cantidad","fecha_proveedor","id_proveedor")');
+        $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "producto" and column_name not in ("precio_Original","cantidad","fecha_proveedor","id_proveedor")  order by ordinal_position');
         $info = $bd->prepare($cad);
     }
     if (isset($_REQUEST['btn-actualizar'])) {
@@ -105,7 +105,7 @@ try {
                 if (isset($_REQUEST['orden']) && isset($_REQUEST['tipo_orden']) && $_REQUEST['tipo_orden'] != "" && $_REQUEST['orden'] != "") {
                     $cad .= ' ORDER BY ' . $_REQUEST['orden'] . ' ' . $_REQUEST['tipo_orden'];
                 }
-                $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "pedido" and column_name not in ("destino","metodo_pago","numTarjeta","id_Usuario")');
+                $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "pedido" and column_name not in ("destino","metodo_pago","numTarjeta","id_Usuario")  order by ordinal_position');
                 $info = $bd->prepare($cad);
                 break;
             case "producto":
@@ -123,7 +123,7 @@ try {
                 if (isset($_REQUEST['orden']) && isset($_REQUEST['tipo_orden']) && $_REQUEST['tipo_orden'] != "" && $_REQUEST['orden'] != "") {
                     $cad .= ' ORDER BY ' . $_REQUEST['orden'] . ' ' . $_REQUEST['tipo_orden'];
                 }
-                $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "producto" and column_name not in ("precio_Original","cantidad","fecha_proveedor","id_proveedor")');
+                $columnas = $bd->prepare('SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "producto" and column_name not in ("precio_Original","cantidad","fecha_proveedor","id_proveedor")  order by ordinal_position');
                 $info = $bd->prepare($cad);
                 break;
         }
@@ -295,6 +295,7 @@ try {
 
         .info {
             margin-top: 50px;
+            text-align: center;
         }
 
         .info div {
@@ -304,10 +305,11 @@ try {
         .info .input {
             padding: 0px 10px;
             width: 300px;
+            margin: 20px auto;
         }
 
         .info button {
-            margin-left: 30px;
+            width: 300px;
         }
 
         #tlf input,
@@ -318,7 +320,6 @@ try {
         }
 
         #actu {
-            margin-left: 90px;
             margin-bottom: 30px;
         }
 
